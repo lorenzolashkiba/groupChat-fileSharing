@@ -19,9 +19,14 @@ public class Client implements ActionListener{
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
 			System.out.println(this.frame.getPannelloClient().getMessageField().getText());
 			this.frame.getPannelloClient().clearMessageField();
-			//TODO: gestire la parte grafica --> tolgo il messaggio dal textField
+			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
+			System.out.println(messaggio);
+			this.frame.getPannelloClient().getChatArea().append(":"+messaggio);
 			//TODO: mando il messaggio al server 
 			//TODO: il server lo manda agli altri client in FORMATO --> nomeUtente: messaggio --> se il nomeUtente è == a quello del client dove lo invia si scrive You
+		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
+			//TODO: aprire nuova finestra dove scegliere l'immagine da mandare e visualizzarla
+			//TODO: gestire l'invio dell'immagine al server
 		}
 	}
 

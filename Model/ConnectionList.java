@@ -1,15 +1,15 @@
 package Model;
 
 
-import Controller.ConnectionHandler;
+import Control.ConnectionHandler;
 
 import java.util.ArrayList;
 
-public class Model {
+public class ConnectionList {
 
     public static ArrayList<ConnectionHandler> connectionHandlers;
 
-    public Model() {
+    public ConnectionList() {
         connectionHandlers = new ArrayList<>();
     }
 

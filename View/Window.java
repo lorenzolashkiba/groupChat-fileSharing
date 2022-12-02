@@ -17,7 +17,7 @@ import Control.Client;
 public class Window extends JFrame implements WindowListener{
 
 	private PannelloChat pannelloClient;
-	
+	private String username;
 	public PannelloChat getPannelloClient() {
 		return pannelloClient;
 	}
@@ -44,13 +44,20 @@ public class Window extends JFrame implements WindowListener{
 	}
 
 	
+	public String getUsername(){
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	@Override
 	public void windowOpened(WindowEvent e) {
-		String username = JOptionPane.showInputDialog(getParent(),
+		username = JOptionPane.showInputDialog(getParent(),
                 "Enter a username: ", "guest");
 		pannelloClient.setToolBarText("User:"+username);
-		//TODO: mettere in chat il messaggio che il client si è collegato
+		//TODO: mettere in chat il messaggio che il client si ï¿½ collegato
 	}
 
 	@Override
@@ -59,7 +66,7 @@ public class Window extends JFrame implements WindowListener{
 		int control=JOptionPane.showConfirmDialog(this, "Do you want to leave the session?", "Confirm", JOptionPane.YES_NO_OPTION);
 		if(control==JOptionPane.YES_OPTION){
 			System.exit(0);
-			//TODO: scollegare il client e mettere in chat il messaggio che si è collegato
+			//TODO: scollegare il client e mettere in chat il messaggio che si ï¿½ collegato
 		}		
 		else{
 			this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

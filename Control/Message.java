@@ -1,14 +1,14 @@
-package Controller;
+package Control;
 
-import Model.Model;
+import Model.ConnectionList;
 
 import java.util.ArrayList;
 
-public class MessageClient {
+public class Message {
     private ConnectionHandler connectionHandler;
-    private Model model;
+    private ConnectionList model;
     public static ArrayList<ConnectionHandler> connectionHandlers;
-    public MessageClient(ConnectionHandler connectionHandlers, Model model) {
+    public Message(ConnectionHandler connectionHandlers, ConnectionList model) {
         this.connectionHandler = connectionHandlers;
     }
 
@@ -18,10 +18,9 @@ public class MessageClient {
             try{
                 if(!clientHandler.getClientUsername().equals(clientUsername)){
                     clientHandler.out.println(text);
-                    clientHandler.out.flush();
                 }
             }catch (Exception e){
-                clientHandler.closeSocket();
+                //clientHandler.closeSocket();
             }
         }
         return true;

@@ -14,11 +14,12 @@ public class testMain {
 		// TODO Auto-generated method stub
 		System.out.println("start server");
 		try {
-			ServerSocket serverSocket = new ServerSocket(5555);
+			ServerSocket serverSocket = new ServerSocket(5556);
 			Server server = new Server(serverSocket);
 			server.run();
 		}catch (Exception e){
 			System.out.println("server:"+e);
+
 		}
 	}
 

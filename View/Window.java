@@ -56,8 +56,7 @@ public class Window extends JFrame implements WindowListener{
 	public void windowOpened(WindowEvent e) {
 		username = JOptionPane.showInputDialog(getParent(),
                 "Enter a username: ", "guest");
-		username = JOptionPane.showInputDialog(getParent(),
-				"your username is: ", "asdf");
+
 		pannelloClient.setToolBarText("User:"+username);
 		//TODO: mettere in chat il messaggio che il client si � collegato
 	}

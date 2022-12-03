@@ -15,7 +15,7 @@ public class TestMainClient {
             Window frame = new Window();
             try {
                 System.out.println("1");
-                Socket socketClient = new Socket("localhost", 5555);
+                Socket socketClient = new Socket("localhost", 5556);
                 System.out.println("2");
                 Client client = new Client(frame, socketClient);
                 client.run();

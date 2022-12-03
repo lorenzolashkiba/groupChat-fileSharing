@@ -75,13 +75,14 @@ public class Client implements ActionListener,Runnable{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
-			System.out.println(this.frame.getPannelloClient().getMessageField().getText());
-			this.frame.getPannelloClient().clearMessageField();
-			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
-			System.out.println(messaggio);
 
+			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
+
+			//manda il messaggio alla text area
+			this.frame.getPannelloClient().setToolBarText("\n"+messaggio);
 			//TODO: mando il messaggio al server
 			sendMessage(messaggio);
+			this.frame.getPannelloClient().clearMessageField();
 			//TODO: il server lo manda agli altri client in FORMATO --> nomeUtente: messaggio --> se il nomeUtente � == a quello del client dove lo invia si scrive You
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			//TODO: aprire nuova finestra dove scegliere l'immagine da mandare e visualizzarla

@@ -20,8 +20,10 @@ public class ConnectionHandler implements Runnable {
             out = new PrintWriter(this.socketClient.getOutputStream(),true);
             in = new BufferedReader(new InputStreamReader(this.socketClient.getInputStream()));
             //problema salva solo un connectino handler nella lista
-            list.addConnectionHandlers(this);
-            message = new Message(this,list);
+            this.list=list;
+            this.list.addConnectionHandlers(this);
+            message = new Message(list);
+            this.run();
         } catch (IOException e) {
             e.printStackTrace();
         }

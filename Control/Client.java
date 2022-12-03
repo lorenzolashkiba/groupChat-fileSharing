@@ -83,13 +83,14 @@ public class Client implements ActionListener,Runnable{
 					msgGroupChat = in.readLine();
 					if(msgGroupChat!=null) {
 						System.out.println("mgg:"+msgGroupChat);
-						frame.getPannelloClient().getChatArea().append(msgGroupChat);
+						frame.getPannelloClient().getChatArea().append("\n"+msgGroupChat);
 					}
 				}
 			}catch(IOException | InterruptedException e){
 				closeEverything(socket,out,in);
 			}
 		}
+		System.out.println("not connected to server");
 	}
 	// this function runs only when clicked the send button
 	@Override

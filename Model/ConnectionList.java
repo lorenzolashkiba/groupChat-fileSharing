@@ -24,5 +24,8 @@ public class ConnectionList {
     public void removeClienthandler(ConnectionHandler connectionHandler) {
         connectionHandlers.remove(connectionHandler);
     }
+    public ArrayList<ConnectionHandler> getHandlers(){
+        return  connectionHandlers;
+    }
 
 }

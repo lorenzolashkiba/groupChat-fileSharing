@@ -14,7 +14,7 @@ public class testMain {
 		// TODO Auto-generated method stub
 		System.out.println("start server");
 		try {
-			ServerSocket serverSocket = new ServerSocket(5556);
+			ServerSocket serverSocket = new ServerSocket(5556,5);
 			Server server = new Server(serverSocket);
 			server.run();
 		}catch (Exception e){

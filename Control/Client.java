@@ -61,7 +61,7 @@ public class Client implements ActionListener,Runnable{
 	@Override
 	public void run() {
 		String  msgGroupChat;
-		out.println(username);
+
 		while(socket.isConnected()){
 			try{
 				System.out.println(":");

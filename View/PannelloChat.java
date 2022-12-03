@@ -42,7 +42,9 @@ public class PannelloChat extends JPanel {
 	}
 
 	public void setToolBarText(String str) {
-		this.toolBarText.setText(str);;
+		this.toolBarText.setText(str);
+		//questa funzione scrive dentro la text area
+		this.chatArea.append(str);
 	}
 
 	public JTextArea getChatArea() {
@@ -67,7 +69,7 @@ public class PannelloChat extends JPanel {
 	 * Create the panel.
 	 */
 	public PannelloChat() {
-		setBorder(new LineBorder(new Color(0, 0, 0)));
+		setBorder(new LineBorder(new Color(9, 8, 8)));
 		setLayout(new BorderLayout(0, 0));
 		
 		chatArea = new JTextArea();

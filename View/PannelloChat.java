@@ -31,6 +31,7 @@ public class PannelloChat extends JPanel {
 		return messageField;
 	}
 
+
 	public void setMessageField(JTextField textField) {
 		this.messageField = textField;
 	}

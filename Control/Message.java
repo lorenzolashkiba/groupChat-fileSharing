@@ -14,15 +14,18 @@ public class Message {
 
 
     public boolean sendTextMessageBroadC(String text,String clientUsername){
-        for (ConnectionHandler clientHandler : connectionHandlers = model.getConnectionHandlers()) {
-            try{
-                if(!clientHandler.getClientUsername().equals(clientUsername)){
-                    clientHandler.out.println(text);
-                }
-            }catch (Exception e){
-                //clientHandler.closeSocket();
-            }
-        }
+    	
+    	System.out.println(connectionHandlers.get(0)); 
+//    	
+//        for (ConnectionHandler clientHandler : connectionHandlers = model.getConnectionHandlers()) {
+//            try{
+//                if(!clientHandler.getClientUsername().equals(clientUsername)){
+//                    clientHandler.out.println(text);
+//                }
+//            }catch (Exception e){
+//                //clientHandler.closeSocket();
+//            }
+//        }
         return true;
     }
     public boolean sendTextMessageFromClient(String text,String clientUsername){

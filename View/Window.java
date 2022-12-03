@@ -21,7 +21,7 @@ public class Window extends JFrame implements WindowListener{
 	public PannelloChat getPannelloClient() {
 		return pannelloClient;
 	}
-
+	private Client client;
 	public Window() {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,7 +31,9 @@ public class Window extends JFrame implements WindowListener{
 		addWindowListener(this);
 		this.setVisible(true);
 	}
-	
+	public void setClient(Client client){
+		this.client = client;
+	}
 	public String SendMessage() {
 		String str = pannelloClient.getMessageField().getText();
 		return str;
@@ -58,6 +60,8 @@ public class Window extends JFrame implements WindowListener{
                 "Enter a username: ", "guest");
 		pannelloClient.getUsernameLabel().setText("User:"+username);
 		//TODO: mettere in chat il messaggio che il client si � collegato --> bisogna inviarlo al server che lo invia in broadcast a tutti i client 
+		client.setUsername(username);
+		//TODO: mettere in chat il messaggio che il client si � collegato
 	}
 
 	@Override

@@ -26,6 +26,7 @@ public class Server implements Runnable {
                 System.out.println("New client connected");
                 ConnectionHandler handler = new ConnectionHandler(socket,model);
                 handler.run();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

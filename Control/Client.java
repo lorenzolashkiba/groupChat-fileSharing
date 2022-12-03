@@ -29,11 +29,17 @@ public class Client implements ActionListener,Runnable{
 		}catch(IOException e){
 			closeEverything(socket,out,in);
 		}
-		this.username = this.frame.getUsername();
+		this.frame.setClient(this);
+		System.out.println("username:"+this.username);
 		this.frame.AddListeners(this);
 
 	}
-	public void closeEverything(Socket socket,PrintWriter out, BufferedReader in ){
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void closeEverything(Socket socket, PrintWriter out, BufferedReader in ){
 		try {
 			if (in != null) {
 				in.close();
@@ -61,13 +67,16 @@ public class Client implements ActionListener,Runnable{
 	@Override
 	public void run() {
 		String  msgGroupChat;
-		out.println(username);
 
 		while(socket.isConnected()){
 			try{
-				System.out.println(":");
-				msgGroupChat = in.readLine();
-				System.out.println("-"+msgGroupChat);
+				if(username==null) {
+					System.out.println("wait username");
+				}else {
+					System.out.println(":");
+					msgGroupChat = in.readLine();
+					System.out.println("-"+msgGroupChat);
+				}
 			}catch(IOException e){
 				closeEverything(socket,out,in);
 			}
@@ -76,13 +85,12 @@ public class Client implements ActionListener,Runnable{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
-			System.out.println(this.frame.getPannelloClient().getMessageField().getText());
-			this.frame.getPannelloClient().clearMessageField();
-			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
-			System.out.println(messaggio);
 
+			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
+			System.out.println("messaggio da mandare:"+messaggio);
 			//TODO: mando il messaggio al server
 			sendMessage(messaggio);
+			this.frame.getPannelloClient().clearMessageField();
 			//TODO: il server lo manda agli altri client in FORMATO --> nomeUtente: messaggio --> se il nomeUtente � == a quello del client dove lo invia si scrive You
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			//TODO: aprire nuova finestra dove scegliere l'immagine da mandare e visualizzarla

@@ -29,12 +29,17 @@ public class Client implements ActionListener,Runnable{
 		}catch(IOException e){
 			closeEverything(socket,out,in);
 		}
-
+		this.frame.setClient(this);
 		System.out.println("username:"+this.username);
 		this.frame.AddListeners(this);
 
 	}
-	public void closeEverything(Socket socket,PrintWriter out, BufferedReader in ){
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void closeEverything(Socket socket, PrintWriter out, BufferedReader in ){
 		try {
 			if (in != null) {
 				in.close();

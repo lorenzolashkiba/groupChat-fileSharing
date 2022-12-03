@@ -2,32 +2,30 @@ package View;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.JSplitPane;
 import javax.swing.JButton;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
 import java.awt.Font;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.JScrollBar;
+import javax.swing.JLabel;
 
 public class PannelloChat extends JPanel {
 	private JTextField messageField;
-	private JTextPane toolBarText;
 	private JTextArea chatArea;
 	private JButton sendMessageBtn;
 	private JButton sendImgBtn;
+	private JLabel UsernameLabel;
+
+	public JLabel getUsernameLabel() {
+		return UsernameLabel;
+	}
 
 	public JTextField getMessageField() {
 		return messageField;
@@ -37,13 +35,7 @@ public class PannelloChat extends JPanel {
 		this.messageField = textField;
 	}
 
-	public JTextPane getToolBarText() {
-		return toolBarText;
-	}
 
-	public void setToolBarText(String str) {
-		this.toolBarText.setText(str);;
-	}
 
 	public JTextArea getChatArea() {
 		return chatArea;
@@ -67,7 +59,11 @@ public class PannelloChat extends JPanel {
 	 * Create the panel.
 	 */
 	public PannelloChat() {
-		setBorder(new LineBorder(new Color(0, 0, 0)));
+
+		
+
+		setBorder(new LineBorder(new Color(9, 8, 8)));
+
 		setLayout(new BorderLayout(0, 0));
 		
 		chatArea = new JTextArea();
@@ -89,11 +85,12 @@ public class PannelloChat extends JPanel {
 		
 		
 		messageField = new JTextField();
-		messageField.setText("|");
 		messageField.setForeground(Color.GREEN);
 		messageField.setBackground(Color.BLACK);
-		messageField.setFont(new Font("Yu Gothic UI", Font.PLAIN, 15));
+		messageField.setFont(new Font("DialogInput", Font.BOLD, 15));
 		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.weighty = 2.0;
+		gbc_textField.weightx = 2.0;
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.anchor = GridBagConstraints.WEST;
 		gbc_textField.insets = new Insets(0, 0, 0, 5);
@@ -126,13 +123,11 @@ public class PannelloChat extends JPanel {
 		gbc_sendImgBtn.gridy = 0;
 		SendMessagePane.add(sendImgBtn, gbc_sendImgBtn);
 		
-		toolBarText = new JTextPane();
-		toolBarText.setForeground(Color.GREEN);
-		toolBarText.setBackground(Color.BLACK);
-		add(toolBarText, BorderLayout.NORTH);
-		toolBarText.setFont(new Font("Source Code Pro Light", Font.BOLD, 20));
-		toolBarText.setEditable(false);
-		toolBarText.setText("");
+		UsernameLabel = new JLabel("--");
+		UsernameLabel.setFont(new Font("DialogInput", Font.BOLD, 20));
+		UsernameLabel.setForeground(Color.GREEN);
+		UsernameLabel.setBackground(Color.BLACK);
+		add(UsernameLabel, BorderLayout.NORTH);
 
 	}
 

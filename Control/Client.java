@@ -29,7 +29,8 @@ public class Client implements ActionListener,Runnable{
 		}catch(IOException e){
 			closeEverything(socket,out,in);
 		}
-		this.username = this.frame.getUsername();
+
+		System.out.println("username:"+this.username);
 		this.frame.AddListeners(this);
 
 	}
@@ -79,7 +80,7 @@ public class Client implements ActionListener,Runnable{
 			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
 
 			//manda il messaggio alla text area
-			this.frame.getPannelloClient().setToolBarText("\n"+messaggio);
+			this.frame.getPannelloClient().setToolBarText(messaggio);
 			//TODO: mando il messaggio al server
 			sendMessage(messaggio);
 			this.frame.getPannelloClient().clearMessageField();

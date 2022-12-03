@@ -28,9 +28,13 @@ public class PannelloChat extends JPanel {
 	private JTextArea chatArea;
 	private JButton sendMessageBtn;
 	private JButton sendImgBtn;
-
+	private String username;
 	public JTextField getMessageField() {
 		return messageField;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public void setMessageField(JTextField textField) {
@@ -44,7 +48,7 @@ public class PannelloChat extends JPanel {
 	public void setToolBarText(String str) {
 		this.toolBarText.setText(str);
 		//questa funzione scrive dentro la text area
-		this.chatArea.append(str);
+		this.chatArea.append("\n"+username+":"+str);
 	}
 
 	public JTextArea getChatArea() {

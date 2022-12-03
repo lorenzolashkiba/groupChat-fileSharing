@@ -5,17 +5,18 @@ import Model.ConnectionList;
 import java.util.ArrayList;
 
 public class Message {
-    private ConnectionHandler connectionHandler;
+    public ConnectionHandler connectionHandler;
     private ConnectionList model;
     public static ArrayList<ConnectionHandler> connectionHandlers;
+    //da modificare problem di una sola connessione
     public Message(ConnectionHandler connectionHandlers, ConnectionList model) {
         this.connectionHandler = connectionHandlers;
     }
 
 
-    public boolean sendTextMessageBroadC(String text,String clientUsername){
+    public boolean sendTextMessageBroadC(String text,ConnectionHandler connectionHandler){
     	
-    	System.out.println(connectionHandlers.get(0)); 
+    	connectionHandler.out.println(text);
 //    	
 //        for (ConnectionHandler clientHandler : connectionHandlers = model.getConnectionHandlers()) {
 //            try{

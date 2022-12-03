@@ -69,6 +69,7 @@ public class Window extends JFrame implements WindowListener{
 		// TODO Auto-generated method stub
 		int control=JOptionPane.showConfirmDialog(this, "Do you want to leave the session?", "Confirm", JOptionPane.YES_NO_OPTION);
 		if(control==JOptionPane.YES_OPTION){
+			client.sendMessage("/quit");
 			System.exit(0);
 			//TODO: scollegare il client e mettere in chat il messaggio che si � collegato
 		}		

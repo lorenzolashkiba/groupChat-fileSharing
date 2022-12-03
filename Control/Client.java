@@ -37,6 +37,7 @@ public class Client implements ActionListener,Runnable{
 
 	public void setUsername(String username) {
 		this.username = username;
+
 	}
 
 	public void closeEverything(Socket socket, PrintWriter out, BufferedReader in ){
@@ -64,24 +65,33 @@ public class Client implements ActionListener,Runnable{
 		}
 	}
 
+	// this function receive msg from connection handler and update the text area
 	@Override
 	public void run() {
 		String  msgGroupChat;
-
+		boolean flag=true;
 		while(socket.isConnected()){
 			try{
 				if(username==null) {
-					System.out.println("wait username");
+					Thread.sleep(500);
 				}else {
-					System.out.println(":");
+					if(flag){
+						out.println(username);
+						flag=false;
+					}
+
 					msgGroupChat = in.readLine();
-					System.out.println("-"+msgGroupChat);
+					if(msgGroupChat!=null) {
+						System.out.println("mgg:"+msgGroupChat);
+						frame.getPannelloClient().getChatArea().append(msgGroupChat);
+					}
 				}
-			}catch(IOException e){
+			}catch(IOException | InterruptedException e){
 				closeEverything(socket,out,in);
 			}
 		}
 	}
+	// this function runs only when clicked the send button
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {

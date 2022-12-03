@@ -19,23 +19,34 @@ public class ConnectionHandler implements Runnable {
         try {
             out = new PrintWriter(this.socketClient.getOutputStream(),true);
             in = new BufferedReader(new InputStreamReader(this.socketClient.getInputStream()));
+            //problema salva solo un connectino handler nella lista
             list.addConnectionHandlers(this);
             message = new Message(this,list);
-            clientUsername = in.readLine();
-            message.sendTextMessageBroadC("nickname : "+clientUsername,clientUsername);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    // this function receives all the messages sent from the client
     @Override
     public void run() {
-
+        boolean flag=true;
         while(socketClient.isConnected()){
             try {
                 //out.println("1: "+clientUsername);
                 String text = in.readLine();
-                text = clientUsername+text;
-                message.sendTextMessageBroadC(text,clientUsername);
+                if(text!=null&&flag){
+                    clientUsername = text;
+                    flag=false;
+                }else {
+                    if(text.equals("/quit")){
+                        removeClientHandler();
+                        closeSocket();
+                        break;
+                    }
+                    text = clientUsername + ":" + text;
+                    message.sendTextMessageBroadC(text,this);
+                }
 
             } catch (IOException e) {
                 closeSocket();
@@ -52,7 +63,7 @@ public class ConnectionHandler implements Runnable {
     }
     public void removeClientHandler(){
         list.removeClienthandler(this);
-        message.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",clientUsername);
+        message.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",this);
     }
     public void closeEverything(Socket socket,PrintWriter out, BufferedReader in ){
         removeClientHandler();

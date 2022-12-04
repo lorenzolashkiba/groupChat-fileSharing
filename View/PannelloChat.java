@@ -16,6 +16,9 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
@@ -23,14 +26,18 @@ import com.jgoodies.forms.layout.RowSpec;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JScrollBar;
+import javax.swing.JLabel;
 
 public class PannelloChat extends JPanel {
 	private JTextField messageField;
-	private JTextPane toolBarText;
 	private JTextArea chatArea;
 	private JButton sendMessageBtn;
 	private JButton sendImgBtn;
+	private JLabel UsernameLabel;
 
 	public JTextField getMessageField() {
 		return messageField;
@@ -40,12 +47,10 @@ public class PannelloChat extends JPanel {
 		this.messageField = textField;
 	}
 
-	public JTextPane getToolBarText() {
-		return toolBarText;
-	}
 
-	public void setToolBarText(String str) {
-		this.toolBarText.setText(str);;
+
+	public JLabel getUsernameLabel() {
+		return UsernameLabel;
 	}
 
 	public JTextArea getChatArea() {
@@ -70,6 +75,19 @@ public class PannelloChat extends JPanel {
 	 * Create the panel.
 	 */
 	public PannelloChat() {
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		String []fontFamilies = ge.getAvailableFontFamilyNames();
+		try {
+			Font font = Font.createFont(Font.TRUETYPE_FONT, new File("C:\\Users\\marcc\\AppData\\Local\\Microsoft\\Windows\\Fonts\\hacka__.ttf"));
+		} catch (FontFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		setBorder(new LineBorder(new Color(0, 0, 0)));
 		setLayout(new BorderLayout(0, 0));
 		
@@ -129,13 +147,10 @@ public class PannelloChat extends JPanel {
 		gbc_sendImgBtn.gridy = 0;
 		SendMessagePane.add(sendImgBtn, gbc_sendImgBtn);
 		
-		toolBarText = new JTextPane();
-		toolBarText.setForeground(Color.GREEN);
-		toolBarText.setBackground(Color.BLACK);
-		add(toolBarText, BorderLayout.NORTH);
-		toolBarText.setFont(new Font("Source Code Pro Light", Font.BOLD, 20));
-		toolBarText.setEditable(false);
-		toolBarText.setText("");
+		UsernameLabel = new JLabel("New label");
+		UsernameLabel.setForeground(Color.GREEN);
+		UsernameLabel.setBackground(Color.BLACK);
+		add(UsernameLabel, BorderLayout.NORTH);
 
 	}
 

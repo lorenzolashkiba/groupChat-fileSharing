@@ -58,9 +58,15 @@ public class Client implements ActionListener,Runnable{
 	public void sendMessage(String messageToSend){
 		try{
 			//first message to send is the username
+			System.out.println("arrive");
+			//si blocca qua perche non si crea il socket credo perche senno dovrebbe stampare
+			//new client connected, non mi ricordo ma tu utilizza intellij?
+			//hai qualche idea? io penso che  ...
+
 			out.println(messageToSend);
 
 		}catch(Exception e){
+			System.out.println("not connected");
 			closeEverything(socket,out,in);
 		}
 	}

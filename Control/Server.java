@@ -9,11 +9,12 @@ import java.net.Socket;
 public class Server implements Runnable {
 
     private ServerSocket serverSocket;
-    private ConnectionList model;
+    private ConnectionList connectionList;
+    private MessageHandler messageHandler;
     public Server(ServerSocket serverSocket){
         this.serverSocket = serverSocket;
-        model = new ConnectionList();
-
+        connectionList = new ConnectionList();
+        messageHandler = new MessageHandler(connectionList);
     }
     @Override
     public void run() {
@@ -24,8 +25,11 @@ public class Server implements Runnable {
                 System.out.println("waiting");
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
-                ConnectionHandler handler = new ConnectionHandler(socket,model);
+
+                ConnectionHandler handler = new ConnectionHandler(socket,messageHandler);
                 handler.run();
+                //non so il perche ma non arriva qui ma dovrebbe, non stampa finished
+                //bruh com'è possibile?
                 System.out.println("finished");
             } catch (IOException e) {
                 e.printStackTrace();

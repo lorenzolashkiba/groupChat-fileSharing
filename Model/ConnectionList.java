@@ -17,15 +17,22 @@ public class ConnectionList {
         return connectionHandlers;
     }
 
-    public void addConnectionHandlers(ConnectionHandler connectionHandler) {
+    public void addConnectionHandler(ConnectionHandler connectionHandler) {
         connectionHandlers.add(connectionHandler);
     }
 
     public void removeClienthandler(ConnectionHandler connectionHandler) {
         connectionHandlers.remove(connectionHandler);
     }
-    public ArrayList<ConnectionHandler> getHandlers(){
-        return  connectionHandlers;
+
+    public ConnectionHandler getHandler(int x){
+        try {
+            ConnectionHandler con = connectionHandlers.get(x);
+            return con;
+        }catch (IndexOutOfBoundsException e){
+            return null;
+        }
+
     }
 
 }

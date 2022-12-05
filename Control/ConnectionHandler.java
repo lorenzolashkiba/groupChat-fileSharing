@@ -11,18 +11,16 @@ public class ConnectionHandler implements Runnable {
     public BufferedReader in;
     public PrintWriter out;
     private String clientUsername;
-    private Message message;
-    private ConnectionList list;
+    private MessageHandler messageHandler;
 
-    public ConnectionHandler(Socket socket, ConnectionList list){
+    public ConnectionHandler(Socket socket,MessageHandler messageHandler){
         this.socketClient = socket;
         try {
             out = new PrintWriter(this.socketClient.getOutputStream(),true);
             in = new BufferedReader(new InputStreamReader(this.socketClient.getInputStream()));
             //problema salva solo un connectino handler nella lista
-            this.list=list;
-            this.list.addConnectionHandlers(this);
-            message = new Message(list);
+            this.messageHandler = messageHandler;
+            this.messageHandler.addConnectionHandler(this);
             this.run();
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,7 +45,7 @@ public class ConnectionHandler implements Runnable {
                         break;
                     }
                     text = clientUsername + ":" + text;
-                    message.sendTextMessageBroadC(text,this);
+                    messageHandler.sendTextMessageBroadC(text,this);
                 }
 
             } catch (IOException e) {
@@ -64,8 +62,8 @@ public class ConnectionHandler implements Runnable {
         closeEverything(socketClient,out,in);
     }
     public void removeClientHandler(){
-        list.removeClienthandler(this);
-        message.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",this);
+        messageHandler.removeClient(this);
+        messageHandler.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",this);
     }
     public void closeEverything(Socket socket,PrintWriter out, BufferedReader in ){
         removeClientHandler();
@@ -82,5 +80,8 @@ public class ConnectionHandler implements Runnable {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+    public String toString(){
+        return clientUsername;
     }
 }

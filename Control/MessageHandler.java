@@ -4,22 +4,24 @@ import Model.ConnectionList;
 
 import java.util.ArrayList;
 
-public class Message {
+public class MessageHandler {
     public ConnectionHandler connectionHandler;
-    private ConnectionList model;
-    public static ArrayList<ConnectionHandler> connectionHandlers;
-    //da modificare problem di una sola connessione
-    public Message( ConnectionList model) {
-     this.model = model;
+    private ConnectionList connectionList;
+    public MessageHandler(ConnectionList connectionList) {
+     this.connectionList = connectionList;
     }
 
-
+    public void addConnectionHandler(ConnectionHandler connectionHandler){
+        connectionList.addConnectionHandler(connectionHandler);
+    }
     public boolean sendTextMessageBroadC(String text,ConnectionHandler connectionHandler){
     	
     	//connectionHandler.out.println(text);
-        connectionHandlers = model.getHandlers();
-        System.out.println(connectionHandlers.toString());
-        for (ConnectionHandler clientHandler : connectionHandlers = model.getConnectionHandlers()) {
+        ArrayList<ConnectionHandler> connectionHandlers;
+        for (ConnectionHandler clientHandler : connectionHandlers = connectionList.getConnectionHandlers()) {
+          // stampa di tutti i client salvati dentro l'array
+            //
+            System.out.println(clientHandler.toString());
             try{
                // if(!clientHandler.getClientUsername().equals(connectionHandler.getClientUsername())){
                     clientHandler.out.println(text);
@@ -31,8 +33,12 @@ public class Message {
         }
         return true;
     }
+    public void removeClient(ConnectionHandler con){
+        connectionList.removeClienthandler(con);
+    }
     public boolean sendTextMessageFromClient(String text,String clientUsername){
-        for (ConnectionHandler clientHandler : connectionHandlers = model.getConnectionHandlers()) {
+        ArrayList<ConnectionHandler> connectionHandlers;
+        for (ConnectionHandler clientHandler : connectionHandlers = connectionList.getConnectionHandlers()) {
             try{
                 if(!clientHandler.getClientUsername().equals(clientUsername)){
                     clientHandler.out.println(text);

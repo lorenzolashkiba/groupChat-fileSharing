@@ -18,7 +18,8 @@ public class TestMainClient {
                 Socket socketClient = new Socket("localhost", 5556);
                 System.out.println("2");
                 Client client = new Client(frame, socketClient);
-                client.run();
+                Thread ct = new Thread(client);
+                ct.start();
             }catch (Exception e){
                 System.out.println("client"+e);
             }

@@ -16,7 +16,7 @@ public class testMain {
 		try {
 			ServerSocket serverSocket = new ServerSocket(5556,5);
 			Server server = new Server(serverSocket);
-			server.run();
+			server.startServer();
 		}catch (Exception e){
 			System.out.println("server:"+e);
 

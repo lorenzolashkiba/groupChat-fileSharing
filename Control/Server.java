@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Runnable {
+public class Server{
 
     private ServerSocket serverSocket;
     private ConnectionList connectionList;
@@ -16,8 +16,7 @@ public class Server implements Runnable {
         connectionList = new ConnectionList();
         messageHandler = new MessageHandler(connectionList);
     }
-    @Override
-    public void run() {
+    public void startServer() {
         System.out.println("SERVER START .... ");
         while(!serverSocket.isClosed()) {
             try {
@@ -27,7 +26,9 @@ public class Server implements Runnable {
                 System.out.println("New client connected");
 
                 ConnectionHandler handler = new ConnectionHandler(socket,messageHandler);
-                handler.run();
+
+                Thread th = new Thread(handler);
+                th.start();
                 //non so il perche ma non arriva qui ma dovrebbe, non stampa finished
                 //bruh com'è possibile?
                 System.out.println("finished");

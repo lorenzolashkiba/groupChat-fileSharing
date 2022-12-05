@@ -4,9 +4,10 @@ import Model.ConnectionList;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ConnectionHandler implements Runnable {
-
+    public static ArrayList<ConnectionHandler> connectionHandlers = new ArrayList<>();
     private Socket socketClient;
     public BufferedReader in;
     public PrintWriter out;
@@ -18,15 +19,34 @@ public class ConnectionHandler implements Runnable {
         try {
             out = new PrintWriter(this.socketClient.getOutputStream(),true);
             in = new BufferedReader(new InputStreamReader(this.socketClient.getInputStream()));
+            System.out.println("Connesione richiesta da: "+ socketClient.getInetAddress().toString()+":"+socketClient.getPort());
             //problema salva solo un connectino handler nella lista
-            this.messageHandler = messageHandler;
-            this.messageHandler.addConnectionHandler(this);
+           // this.messageHandler = messageHandler;
+            //this.messageHandler.addConnectionHandler(this);
+            connectionHandlers.add(this);
             this.run();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    public boolean sendTextMessageBroadC(String text,ConnectionHandler connectionHandler){
 
+        //connectionHandler.out.println(text);
+        for (ConnectionHandler clientHandler : connectionHandlers) {
+            // stampa di tutti i client salvati dentro l'array
+            //
+            System.out.println(clientHandler.toString());
+            try{
+                // if(!clientHandler.getClientUsername().equals(connectionHandler.getClientUsername())){
+                clientHandler.out.println(text);
+                // }
+            }catch (Exception e){
+                clientHandler.out.println("quit");
+                clientHandler.closeSocket();
+            }
+        }
+        return true;
+    }
     // this function receives all the messages sent from the client
     @Override
     public void run() {
@@ -40,12 +60,12 @@ public class ConnectionHandler implements Runnable {
                     flag=false;
                 }else {
                     if(text.equals("/quit")){
-                        removeClientHandler();
+                        //removeClientHandler();
                         closeSocket();
                         break;
                     }
                     text = clientUsername + ":" + text;
-                    messageHandler.sendTextMessageBroadC(text,this);
+                    sendTextMessageBroadC(text,this);
                 }
 
             } catch (IOException e) {
@@ -62,8 +82,9 @@ public class ConnectionHandler implements Runnable {
         closeEverything(socketClient,out,in);
     }
     public void removeClientHandler(){
-        messageHandler.removeClient(this);
-        messageHandler.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",this);
+        connectionHandlers.remove(this);
+        //messageHandler.removeClient(this);
+        //messageHandler.sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!",this);
     }
     public void closeEverything(Socket socket,PrintWriter out, BufferedReader in ){
         removeClientHandler();

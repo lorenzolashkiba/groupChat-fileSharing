@@ -35,6 +35,7 @@ public class Client implements ActionListener,Runnable{
 
 	}
 
+	//TODO: controllo che lo user non esista gia
 	public void setUsername(String username) {
 		this.username = username;
 		try {

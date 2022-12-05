@@ -37,4 +37,5 @@ public class RunServer {
  * :-> /vote [question] : [yes,no,maybe] questo genera la votazione
  * :-> /vote yes 
  * :-> /vote end questo finisce la votazione e stampa in broadcast il risultato
+ * : fare uno STACK di messaggi con la possibilità di richiamarli con le freccette
  */

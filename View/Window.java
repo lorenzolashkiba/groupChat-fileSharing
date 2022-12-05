@@ -59,8 +59,9 @@ public class Window extends JFrame implements WindowListener{
 
 	@Override
 	public void windowOpened(WindowEvent e) {
+		Integer rand = (int)(Math.random()*9999 - 0 + 1);
 		username = JOptionPane.showInputDialog(getParent(),
-                "Enter a username: ", "guest");
+                "Enter a username: ", "Guest" + rand.toString());
 		pannelloClient.getUsernameLabel().setText("User:"+username);
 		client.setUsername(username);
 		

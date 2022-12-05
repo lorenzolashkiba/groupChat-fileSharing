@@ -42,17 +42,15 @@ public class ConnectionHandler implements Runnable {
 				if(msgFromClient.startsWith("/nick")) {
 					String oldUsername = clientUsername;
 					clientUsername = msgFromClient.substring(6);
-					sendTextMessageBroadC("/SERVER: "+oldUsername + " has changed his name to " + clientUsername);	
+					sendTextMessageBroadC("SERVER:: "+ oldUsername + " has changed his name to " + clientUsername);	
 				}else if(msgFromClient.startsWith("/quit")){
 					closeEverything(socketClient, Writer, Reader);
 					break;
-//					System.exit(0);
 				}
 				else {
 					sendTextMessageBroadC(msgFromClient);				
 				}
 			}else {
-				System.out.println("is NULL");
 				closeEverything(socketClient, Writer, Reader);
 				break;
 			}
@@ -72,7 +70,7 @@ public class ConnectionHandler implements Runnable {
         for (ConnectionHandler cH : connectionHandlers) {
          try {
         	 
-        	 if(messageToSend.startsWith("/")) {
+        	 if(messageToSend.startsWith("SERVER")) {
         		cH.Writer.write(messageToSend);
  				cH.Writer.newLine();
  				cH.Writer.flush(); 

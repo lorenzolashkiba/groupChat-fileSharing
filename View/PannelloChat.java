@@ -125,7 +125,7 @@ public class PannelloChat extends JPanel {
 		gbc_sendImgBtn.gridy = 0;
 		SendMessagePane.add(sendImgBtn, gbc_sendImgBtn);
 		
-		UsernameLabel = new JLabel("--");
+		UsernameLabel = new JLabel("");
 		UsernameLabel.setFont(new Font("DialogInput", Font.BOLD, 20));
 		UsernameLabel.setForeground(Color.GREEN);
 		UsernameLabel.setBackground(Color.BLACK);

@@ -68,6 +68,7 @@ public class PannelloChat extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		chatArea = new JTextArea();
+		chatArea.setEditable(false);
 		chatArea.setForeground(Color.GREEN);
 		chatArea.setBackground(Color.BLACK);
 		chatArea.setLineWrap(true);

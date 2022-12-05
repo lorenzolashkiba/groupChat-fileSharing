@@ -19,3 +19,22 @@ public class RunServer {
 	}
 
 }
+
+/*
+ * interfaccia tipo Messanger (HACKER)
+ * Invio Immagini e visualizzarle come messaggi 
+ * -> creare una classe Messaggio(Model) che ha come attributi
+ * -> nomeUtente, testo, immagine(opzionale) e fa già il controllo
+ * -> dei comandi (/nick, /quit, @name ecc...)  
+ * 
+ * 
+ * : COMANDI :
+ * : /nick --> controllo che il nick non esista già (anche all'inizio del programma)
+ * : /quit
+ * : /help
+ * : @name per chattare ad un solo user
+ * : /userList stampa tutti gli user connessi
+ * :-> /vote [question] : [yes,no,maybe] questo genera la votazione
+ * :-> /vote yes 
+ * :-> /vote end questo finisce la votazione e stampa in broadcast il risultato
+ */

@@ -5,7 +5,10 @@ import java.awt.EventQueue;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.lang.ModuleLayer.Controller;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -56,12 +59,13 @@ public class Window extends JFrame implements WindowListener{
 
 	@Override
 	public void windowOpened(WindowEvent e) {
+		Integer rand = (int)(Math.random()*9999 - 0 + 1);
 		username = JOptionPane.showInputDialog(getParent(),
-                "Enter a username: ", "guest");
+                "Enter a username: ", "Guest" + rand.toString());
 		pannelloClient.getUsernameLabel().setText("User:"+username);
-		//TODO: mettere in chat il messaggio che il client si � collegato --> bisogna inviarlo al server che lo invia in broadcast a tutti i client 
 		client.setUsername(username);
-		//TODO: mettere in chat il messaggio che il client si � collegato
+		
+		
 	}
 
 	@Override

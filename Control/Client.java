@@ -3,8 +3,10 @@ package Control;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -15,38 +17,45 @@ public class Client implements ActionListener,Runnable{
 
 	private Window frame;
 	private Socket socket;
-	private BufferedReader in;
-	private PrintWriter out;
+	private BufferedReader Reader;
+	private BufferedWriter Writer;
 	private String username;
 
-	public Client(Window _frame, Socket socket) { // poi gli passo anche il model qui, perch� viene gestito dal client
+	public Client(Window _frame, Socket socket) { 
 		this.frame = _frame;
 		try {
 			this.socket = socket;
-			out = new PrintWriter(this.socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-
+			Writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			Reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}catch(IOException e){
-			closeEverything(socket,out,in);
+			closeEverything(socket,Writer,Reader);
 		}
 		this.frame.setClient(this);
-		System.out.println("username:"+this.username);
 		this.frame.AddListeners(this);
 
 	}
 
+	//TODO: controllo che lo user non esista gia
 	public void setUsername(String username) {
 		this.username = username;
+		try {
+			Writer.write(username);
+			Writer.newLine();
+			Writer.flush();
+		} catch (IOException e) {
+			closeEverything(socket,Writer,Reader);
+		}
+		
 
 	}
 
-	public void closeEverything(Socket socket, PrintWriter out, BufferedReader in ){
+	public void closeEverything(Socket socket, BufferedWriter writer, BufferedReader in ){
 		try {
 			if (in != null) {
 				in.close();
 			}
-			if (out != null) {
-				out.close();
+			if (writer != null) {
+				writer.close();
 			}
 			if (socket != null) {
 				socket.close();
@@ -55,65 +64,69 @@ public class Client implements ActionListener,Runnable{
 			e.printStackTrace();
 		}
 	}
+	
 	public void sendMessage(String messageToSend){
 		try{
-			//first message to send is the username
-			System.out.println("arrive");
-			//si blocca qua perche non si crea il socket credo perche senno dovrebbe stampare
-			//new client connected, non mi ricordo ma tu utilizza intellij?
-			//hai qualche idea? io penso che  ...
-
-			out.println(messageToSend);
-
-		}catch(Exception e){
-			System.out.println("not connected");
-			closeEverything(socket,out,in);
+			
+			Writer.write(messageToSend);
+			Writer.newLine();
+			Writer.flush();
+			
+		}catch(IOException e){
+			closeEverything(socket,Writer,Reader);
 		}
 	}
 
-	// this function receive msg from connection handler and update the text area
-	@Override
-	public void run() {
-		String  msgGroupChat;
-		boolean flag=true;
-		while(socket.isConnected()){
-			try{
-				if(username==null) {
-					Thread.sleep(500);
-				}else {
-					if(flag){
-						out.println(username);
-						flag=false;
-					}
-
-					msgGroupChat = in.readLine();
-					if(msgGroupChat!=null) {
-						System.out.println("mgg:"+msgGroupChat);
-						frame.getPannelloClient().getChatArea().append("\n"+msgGroupChat);
+	public void listenForMessage() {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				String msgFromBroadcast;
+				
+				while(socket.isConnected()) {
+					try {
+						msgFromBroadcast = Reader.readLine();
+						System.out.println(msgFromBroadcast);
+						frame.getPannelloClient().getChatArea().append(msgFromBroadcast + "\n");
+						
+					} catch (Exception e) {
+						closeEverything(socket, Writer, Reader);
+						break;
 					}
 				}
-			}catch(IOException | InterruptedException e){
-				closeEverything(socket,out,in);
-			}
-		}
-		System.out.println("not connected to server");
+				
+			};
+		}).start();
+		
 	}
+	
+	
+	
+	
 	// this function runs only when clicked the send button
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
-
-			String messaggio = this.frame.getPannelloClient().getMessageField().getText();
-			System.out.println("messaggio da mandare:"+messaggio);
-			//TODO: mando il messaggio al server
-			sendMessage(messaggio);
+			String msgToSend= this.frame.getPannelloClient().getMessageField().getText();
+			sendMessage(msgToSend);
+			if(msgToSend.startsWith("/quit")) {
+				System.exit(0);
+			}
 			this.frame.getPannelloClient().clearMessageField();
-			//TODO: il server lo manda agli altri client in FORMATO --> nomeUtente: messaggio --> se il nomeUtente � == a quello del client dove lo invia si scrive You
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			//TODO: aprire nuova finestra dove scegliere l'immagine da mandare e visualizzarla
 			//TODO: gestire l'invio dell'immagine al server
 		}
 	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 
 }

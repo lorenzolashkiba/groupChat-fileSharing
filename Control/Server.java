@@ -1,23 +1,19 @@
 package Control;
 
-import Model.ConnectionList;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Runnable {
+public class Server{
 
     private ServerSocket serverSocket;
-    private ConnectionList connectionList;
-    private MessageHandler messageHandler;
+
     public Server(ServerSocket serverSocket){
         this.serverSocket = serverSocket;
-        connectionList = new ConnectionList();
-        messageHandler = new MessageHandler(connectionList);
     }
-    @Override
-    public void run() {
+    
+    public void startServer() {
         System.out.println("SERVER START .... ");
         while(!serverSocket.isClosed()) {
             try {
@@ -26,25 +22,29 @@ public class Server implements Runnable {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
 
-                ConnectionHandler handler = new ConnectionHandler(socket,messageHandler);
-                handler.run();
-                //non so il perche ma non arriva qui ma dovrebbe, non stampa finished
-                //bruh com'è possibile?
+
+                ConnectionHandler handler = new ConnectionHandler(socket);
+                Thread th = new Thread(handler);
+                th.start();
+             
                 System.out.println("finished");
+                
             } catch (IOException e) {
-                e.printStackTrace();
+               this.closeServerSocket();
             }
         }
     }
 
     public void closeServerSocket(){
         try{
-            if(!serverSocket.isClosed()){
-                serverSocket.close();
-            }
+        	if(serverSocket != null) {
+        		serverSocket.close();
+        	}
         }catch(IOException e ){
             e.printStackTrace();
         }
 
     }
+    
+  
 }

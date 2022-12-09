@@ -2,6 +2,8 @@ package Control;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +12,7 @@ import java.util.Scanner;
 import Model.Message;
 import View.Window;
 
-public class Client implements ActionListener,Runnable{
+public class Client implements ActionListener{
 
 	private Window frame;
 	private Socket socket;
@@ -142,10 +144,11 @@ public class Client implements ActionListener,Runnable{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
+		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn() ) {
 			String msgToSend= this.frame.getPannelloClient().getMessageField().getText();
-			sendMessage(msgToSend);
 			Message message = new Message("You",msgToSend);
+			frame.getPannelloClient().addMessageFromClient(message);
+			sendMessage(msgToSend);
 			String retCode = message.checkForCodeInText();
 			System.out.println("RETCODE " + retCode);
 			System.out.println(message.getText());
@@ -153,12 +156,11 @@ public class Client implements ActionListener,Runnable{
 				System.exit(0);
 			}
 			if(retCode == "NICK") {
-				System.out.println("CIAO");
 				startUsername = message.getText();
 				frame.getPannelloClient().setUsernameLabel(message.getText());
 				
 			}
-			frame.getPannelloClient().addMessageFromClient(message);
+			
 			this.frame.getPannelloClient().clearMessageField();
 			System.out.println(startUsername);
 			
@@ -176,11 +178,8 @@ public class Client implements ActionListener,Runnable{
 		}
 	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
+
+
 
 
 

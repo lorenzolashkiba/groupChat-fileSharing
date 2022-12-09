@@ -1,6 +1,10 @@
 package View;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+
+import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import javax.swing.border.LineBorder;
 
@@ -24,6 +28,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 
 import java.awt.ScrollPane;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.Panel;
 import net.miginfocom.swing.MigLayout;
 import java.awt.FlowLayout;
@@ -41,60 +47,7 @@ public class PannelloChat extends JPanel {
 	private Window frame;
 
 	
-	public JPanel getMessagesContainer() {
-		return messagesContainer;
-	}
 	
-	public void refreshWindow() {
-		frame.setSize(frame.getSize().width, frame.getSize().height + 1);
-		frame.setSize(frame.getSize().width, frame.getSize().height - 1);
-		System.out.println("REFRESHED");
-	}
-	public void addMessageFromClient(Message message) { //poi gli passeremo l'oggeto Message
-		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 1 "+contMessageRow+",grow");
-		refreshWindow();
-		
-		contMessageRow++;
-	}
-	
-	public void addMessageFromServer(Message message) { //poi gli passeremo l'oggeto Message
-		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 0 "+contMessageRow+",grow");
-		refreshWindow();
-	
-		contMessageRow++;
-	}
-
-	public JLabel getUsernameLabel() {
-		return UsernameLabel;
-	}
-	
-	public void setUsernameLabel(String txt) {
-		UsernameLabel.setText(txt);
-	}
-
-	public JTextField getMessageField() {
-		return messageField;
-	}
-
-
-	public void setMessageField(JTextField textField) {
-		this.messageField = textField;
-	}
-
-
-	public JButton getSendMessageBtn() {
-		return sendMessageBtn;
-	}
-
-	public JButton getSendImgBtn() {
-		return sendImgBtn;
-	}
-
-	
-	public void clearMessageField() {
-		messageField.setText("");
-	}
-
 	public PannelloChat(Window _frame) {
 	
 		this.frame = _frame;
@@ -107,15 +60,7 @@ public class PannelloChat extends JPanel {
 		setBorder(new LineBorder(new Color(9, 8, 8)));
 
 		setLayout(new BorderLayout(0, 0));
-		
-//		chatArea = new JTextArea();
-//		chatArea.setEditable(false);
-//		chatArea.setForeground(Color.GREEN);
-//		chatArea.setBackground(Color.BLACK);
-//		chatArea.setLineWrap(true);
-//		chatArea.setFont(new Font("Source Sans Pro Light", Font.BOLD, 15));
-//		add(chatArea, BorderLayout.CENTER);
-		
+
 		JPanel SendMessagePane = new JPanel();
 		SendMessagePane.setBackground(Color.BLACK);
 		add(SendMessagePane, BorderLayout.SOUTH);
@@ -175,7 +120,7 @@ public class PannelloChat extends JPanel {
 	
 
 		
-		scrollPane = new ScrollPane();
+		scrollPane = new ScrollPane(scrollPane.SCROLLBARS_AS_NEEDED);
 		scrollPane.setBackground(Color.BLACK);
 		add(scrollPane, BorderLayout.CENTER);
 		
@@ -184,12 +129,68 @@ public class PannelloChat extends JPanel {
 		scrollPane.add(messagesContainer);
 		messagesContainer.setLayout(new MigLayout("", "[grow,fill][grow,fill]"));
 		
-		
-		
-		
-
 	
 	}
+	
+	
+	public JPanel getMessagesContainer() {
+		return messagesContainer;
+	}
+	
+
+	public void refreshWindow() {
+		frame.setSize(frame.getSize().width, frame.getSize().height + 1);
+		frame.setSize(frame.getSize().width, frame.getSize().height - 1);
+		System.out.println(scrollPane.getVAdjustable().getMaximum());
+		scrollPane.setScrollPosition((int) scrollPane.getScrollPosition().getX(),scrollPane.getVAdjustable().getMaximum());
+		System.out.println("REFRESHED");
+	}
+	public void addMessageFromClient(Message message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 1 "+contMessageRow+",grow");
+		refreshWindow();
+		
+		contMessageRow++;
+	}
+	
+	public void addMessageFromServer(Message message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 0 "+contMessageRow+",grow");
+		refreshWindow();
+	
+		contMessageRow++;
+	}
+
+	public JLabel getUsernameLabel() {
+		return UsernameLabel;
+	}
+	
+	public void setUsernameLabel(String txt) {
+		UsernameLabel.setText(txt);
+	}
+
+	public JTextField getMessageField() {
+		return messageField;
+	}
+
+
+	public void setMessageField(JTextField textField) {
+		this.messageField = textField;
+	}
+
+
+	public JButton getSendMessageBtn() {
+		return sendMessageBtn;
+	}
+
+	public JButton getSendImgBtn() {
+		return sendImgBtn;
+	}
+
+	
+	public void clearMessageField() {
+		messageField.setText("");
+	}
+
+
 
 
 }

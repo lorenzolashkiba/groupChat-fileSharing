@@ -123,7 +123,9 @@ public class Client implements ActionListener,Runnable{
 					try {
 						Message message = (Message) clientInputStream.readObject();
 						System.out.println(message.getText());
-						frame.getPannelloClient().addMessageFromServer(message.getUsername(), message.getText()); //poi passando l'oggeto message riusciamo a capire a se � fromServer o Client
+						frame.getPannelloClient().addMessageFromServer(message); 
+						
+						
 					} catch (Exception e) {
 						closeEverything(socket, clientOutputStream, clientInputStream);
 						break;
@@ -143,12 +145,22 @@ public class Client implements ActionListener,Runnable{
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
 			String msgToSend= this.frame.getPannelloClient().getMessageField().getText();
 			sendMessage(msgToSend);
-			frame.getPannelloClient().addMessageFromClient("You", msgToSend);
-			if(msgToSend.startsWith("/quit")) {
+			Message message = new Message("You",msgToSend);
+			String retCode = message.checkForCodeInText();
+			System.out.println("RETCODE " + retCode);
+			System.out.println(message.getText());
+			if(retCode == "QUIT") {
 				System.exit(0);
 			}
-			
+			if(retCode == "NICK") {
+				System.out.println("CIAO");
+				startUsername = message.getText();
+				frame.getPannelloClient().setUsernameLabel(message.getText());
+				
+			}
+			frame.getPannelloClient().addMessageFromClient(message);
 			this.frame.getPannelloClient().clearMessageField();
+			System.out.println(startUsername);
 			
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			String filePath = frame.openFileSelecterDialog();

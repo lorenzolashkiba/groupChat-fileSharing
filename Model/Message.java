@@ -8,6 +8,11 @@ public class Message implements Serializable {
 	//private static ArrayList<File> files;
 	private String username;
 	private String Text;
+	private String directToUser;
+	public String getDirectToUser() {
+		return directToUser;
+	}
+
 	//img
 	private String filename;
 	
@@ -40,7 +45,7 @@ public class Message implements Serializable {
 
 	public String checkForCodeInText() {
 		String retCode = "";
-		if(Text.startsWith("/")) {
+		if(Text.startsWith("/") || Text.startsWith("@")) {
 			if(Text.startsWith("/n")) {
 				retCode = "NICK";
 				Text = Text.substring(3);
@@ -49,27 +54,14 @@ public class Message implements Serializable {
 				}
 			}else if(Text.startsWith("/h")) {
 				retCode = "HELP";
-				Text = Text.substring(3);
-				if(Text.startsWith("lp")) {
-					Text = Text.substring(3);
-				}
 			}else if(Text.startsWith("/q")) {
 				retCode = "QUIT";
-				Text = Text.substring(3);
-				if(Text.startsWith("it")) {
-					Text = Text.substring(3);
-				}
 			}else if(Text.startsWith("/l")) {
 				retCode = "LIST";
-				Text = Text.substring(3);
-				if(Text.startsWith("st")) {
-					Text = Text.substring(3);
-				}
 			}else if(Text.startsWith("@")) {
 				String[] ret= Text.split(" ");
 				System.out.println(ret[1]);
-				retCode = ret[0].substring(1); //username
-				System.out.println(retCode);
+				directToUser = ret[0].substring(1); //username
 				Text = ret[1];
 				retCode = "DIRECT";
 			}else if(Text.startsWith("/vote [")) {

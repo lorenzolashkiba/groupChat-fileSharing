@@ -3,6 +3,9 @@ package View;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.border.LineBorder;
+
+import Model.Message;
+
 import java.awt.Color;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -47,15 +50,15 @@ public class PannelloChat extends JPanel {
 		frame.setSize(frame.getSize().width, frame.getSize().height - 1);
 		System.out.println("REFRESHED");
 	}
-	public void addMessageFromClient(String Username, String message) { //poi gli passeremo l'oggeto Message
-		messagesContainer.add(new MessageBox(Username, message),"cell 1 "+contMessageRow+",grow");
+	public void addMessageFromClient(Message message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 1 "+contMessageRow+",grow");
 		refreshWindow();
 		
 		contMessageRow++;
 	}
 	
-	public void addMessageFromServer(String Username, String message) { //poi gli passeremo l'oggeto Message
-		messagesContainer.add(new MessageBox(Username, message),"cell 0 "+contMessageRow+",grow");
+	public void addMessageFromServer(Message message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 0 "+contMessageRow+",grow");
 		refreshWindow();
 	
 		contMessageRow++;
@@ -63,6 +66,10 @@ public class PannelloChat extends JPanel {
 
 	public JLabel getUsernameLabel() {
 		return UsernameLabel;
+	}
+	
+	public void setUsernameLabel(String txt) {
+		UsernameLabel.setText(txt);
 	}
 
 	public JTextField getMessageField() {

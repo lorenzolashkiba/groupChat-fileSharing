@@ -20,6 +20,9 @@ public class ConnectionHandler implements Runnable {
 			return usersAlreadyVoted;
 		}
 		
+		public void resetUsersAlreadyVoted(){
+			usersAlreadyVoted.clear();
+		}
 		public boolean addUserVote(String username) {
 			boolean ret = true;
 			for(String s : usersAlreadyVoted) {
@@ -59,9 +62,11 @@ public class ConnectionHandler implements Runnable {
     private static ArrayList<Pair> votationAnswers = new ArrayList<>();
     private static String votationQuestion;
     private static String userThatStarted;
+    private Boolean blocked;
 
     public ConnectionHandler(Socket socket){
         try {
+        	blocked = false;
         	this.socketClient = socket;
             serverInputStream = new ObjectInputStream(socket.getInputStream());
             serverOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -69,8 +74,7 @@ public class ConnectionHandler implements Runnable {
             Message message = (Message) serverInputStream.readObject();
             this.clientUsername = message.getUsername();
             connectionHandlers.add(this);
-
-			broadcastMessage(new Message(clientUsername,"has joined the chat!"));
+            broadcastMessage(new Message(clientUsername," has joined the chat!"));
         } catch (Exception e) {
 			closeEverything(socketClient, serverOutputStream, serverInputStream);
 		}
@@ -91,13 +95,23 @@ public class ConnectionHandler implements Runnable {
         	//READ MESSAGE
 			System.out.println("FATTO");
 			code = msgFromClient.checkForCodeInText();
+			System.out.println("============================> "+code);
+			
 			switch (code) {
 				case "NICK": {
-					this.clientUsername = msgFromClient.getText();
-					message = "SERVER " + msgFromClient.getUsername() + " changed his username into " + this.clientUsername;
-					msgFromClient.setUsername(this.clientUsername);
-					//check if username already exists
-
+					if(!userExists(msgFromClient.getText())) {
+						blocked = false;
+						this.clientUsername = msgFromClient.getText();
+						message = msgFromClient.getUsername() + " changed his username into " + this.clientUsername;
+						msgFromClient.setUsername(this.clientUsername);
+						broadcastMessage(new Message("SERVER",message));
+					}else {
+						blocked = true;
+						message = msgFromClient.getText() + " is already in use Please change it immediatly";
+						sendToUserFromServer(new Message(msgFromClient.getUsername(), message));
+					}
+				
+					break;
 				}
 				case "HELP": {
 					message = "========================\r\n"
@@ -113,21 +127,25 @@ public class ConnectionHandler implements Runnable {
 							+ "and print results\r\n"
 							+ "/v o /vote A to vote\r\n"
 							+ "========================";
-					//broadcast message
+					sendToUserFromServer(new Message(msgFromClient.getUsername(),message));
+					break;
 				}
 			case "QUIT": {
-				message = "SERVER " + this.clientUsername + " left the chat :(";
-				//broadcast message
+				message = this.clientUsername + " left the chat :(";
+				broadcastMessage(new Message("SERVER",message));
 				closeEverything(socketClient, serverOutputStream, serverInputStream);
 				break;
 			}
 			case "LIST": {
 				message = printUsernames();
-				//broadcast message
+				sendToUserFromServer(new Message(msgFromClient.getUsername(),message));
+				break;
 			}
 			case "DIRECT":{
-				message = msgFromClient.getText(); //questo è lo username dello user a cui vogliamo inviare il messagio
+				message = msgFromClient.getDirectToUser();//questo è lo username dello user a cui vogliamo inviare il messagio
 				//TODO:funzione che invia un messaggio ad uno user, e controlla che lo user esita
+				sendToUserFromUser(new Message(message,msgFromClient.getText()));
+				break;
 			}
 			case "VOTECREATE": {
 				if(!createVotation(msgFromClient.getText())) {
@@ -136,28 +154,34 @@ public class ConnectionHandler implements Runnable {
 					message = msgFromClient.getText();
 				}
 				//broadcast message
+				broadcastMessage(msgFromClient);
+				break;
 			}
 			case "VOTEEND": {
 				message = endVotation();
 				if(message == "ERROR") {
-					message = "SERVER " + this.clientUsername + " didn't start the votation";
+					message = this.clientUsername + " didn't start the votation";
 				}
-				//broadcast message
+				broadcastMessage(new Message("SERVER",message));
+				break;
 			}
 			case "VOTE": {
 				if(!addVote(msgFromClient.getText(), this.clientUsername)) {
-					message = "SERVER " + this.clientUsername + " has already voted this choice";
+					message = this.clientUsername + " has already voted this choice";
 				}else {
 					message = this.clientUsername + " voted " + msgFromClient.getText();
 				}
-				//broadcast message;
+				broadcastMessage(new Message("SERVER",message));
+				break;
 			}
 			case "ERROR incorrect command": {
-				message = "SERVER "+code;
-				//broadcast message
+				message = code;
+				broadcastMessage(new Message("SERVER",message));
+				break;
 			}
 			default:
 				broadcastMessage(msgFromClient);
+				break;
 			}
 			
 		} catch (Exception e) {
@@ -168,6 +192,50 @@ public class ConnectionHandler implements Runnable {
     }
     
 
+    private boolean userExists(String username) {
+    	boolean exists = false;
+    	for (ConnectionHandler cH : connectionHandlers) {   
+    		if(cH.getClientUsername().equals(username)) {
+    			exists = true;
+    		}
+   		}
+    	
+    	return exists;
+    }
+    
+    
+    private void sendToUserFromServer(Message message) {
+    	for (ConnectionHandler cH : connectionHandlers) {   
+    		if(cH.getClientUsername().equals(message.getUsername())) {
+    			try {
+    				cH.serverOutputStream.writeObject(new Message("SERVER",message.getText()));
+    				cH.serverOutputStream.flush();
+    			} catch (IOException e) {
+    				closeEverything(socketClient, serverOutputStream, serverInputStream);
+    			}
+    		}
+   		}
+    
+    	
+    	
+    }
+    
+    private void sendToUserFromUser(Message message) {
+    	for (ConnectionHandler cH : connectionHandlers) {   
+    		if(cH.getClientUsername().equals(message.getUsername())) {
+    			if(!this.blocked) {
+    				try {
+        				cH.serverOutputStream.writeObject(new Message("Directly from "+this.clientUsername,message.getText()));
+        				cH.serverOutputStream.flush();
+        			} catch (IOException e) {
+        				closeEverything(socketClient, serverOutputStream, serverInputStream);
+        			}
+    			}else {
+    				sendToUserFromServer(new Message(this.clientUsername, "You are temporarly blocked, please change your nickname"));
+    			}
+    		}
+   		}
+    }
     public void receiveFile(String fileName){
         try {
             int bytes = 0;
@@ -199,14 +267,13 @@ public class ConnectionHandler implements Runnable {
 
 		for (ConnectionHandler cH : connectionHandlers) {
 			try {
-				if (message.getText().startsWith("SERVER")) {
-					message.setText(message.getText().substring(7));
-					message.setUsername("SERVER");
-
-				}
-				if (!cH.clientUsername.equals(message.getUsername())) {
-					//SEND OBJECT MESSAGE
-					serverOutputStream.writeObject(message);
+				if(!cH.clientUsername.equals(message.getUsername())) {
+					if(!this.blocked) {
+						cH.serverOutputStream.writeObject(message);
+						cH.serverOutputStream.flush();
+					}else {
+	    				sendToUserFromServer(new Message(this.clientUsername, "You are temporarly blocked, please change your nickname"));
+	    			}
 				}
 			} catch (Exception e) {
 				closeEverything(socketClient,serverOutputStream,serverInputStream);
@@ -275,6 +342,9 @@ public class ConnectionHandler implements Runnable {
     }
     
     public void resetVotation() {
+    	for(Pair x : votationAnswers) {
+    		x.resetUsersAlreadyVoted();
+    	}
     	votationAnswers.clear();
     	votationQuestion = "";
     }

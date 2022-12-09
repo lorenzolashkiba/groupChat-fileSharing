@@ -8,13 +8,11 @@ import java.net.Socket;
 public class Server{
 
     private ServerSocket serverSocket;
-   
-    
-    
+
     public Server(ServerSocket serverSocket){
         this.serverSocket = serverSocket;
-     
     }
+    
     public void startServer() {
         System.out.println("SERVER START .... ");
         while(!serverSocket.isClosed()) {
@@ -23,6 +21,7 @@ public class Server{
                 System.out.println("waiting");
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
+
 
                 ConnectionHandler handler = new ConnectionHandler(socket);
                 Thread th = new Thread(handler);

@@ -14,39 +14,27 @@ public class Client implements ActionListener,Runnable{
 
 	private Window frame;
 	private Socket socket;
-	private DataInputStream ReaderD;
-	private DataOutputStream WriterD;
-	private BufferedReader Reader;
-	private BufferedWriter Writer;
-	private String username;
 	private ObjectOutputStream clientOutputStream;
 	private ObjectInputStream clientInputStream;
+	private String startUsername;
 
 	public Client(Window _frame, Socket socket) { 
 		this.frame = _frame;
 		this.frame.setClient(this);
 		try {
 			this.socket = socket;
-			/*Writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-			Reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			ReaderD = new DataInputStream(socket.getInputStream());
-			WriterD = new DataOutputStream(socket.getOutputStream());*/
 			clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
 			clientInputStream = new ObjectInputStream(socket.getInputStream());
-
-
-
 		}catch(IOException e){
-			closeEverything(socket, clientOutputStream, clientInputStream);
+			closeEverything(this.socket, clientOutputStream, clientInputStream);
 		}
-
 		this.frame.AddListeners(this);
 
 	}
 
 	//TODO: controllo che lo user non esista gia
 	public void setUsername(String username) {
-		this.username = username;
+		this.startUsername = username;
 		try {
 			Message message = new Message(username,"");
 			clientOutputStream.writeObject(message);
@@ -74,18 +62,16 @@ public class Client implements ActionListener,Runnable{
 	
 	public void sendMessage(String messageToSend){
 		try{
-			Message message = new Message(username,messageToSend);
+			Message message = new Message(startUsername,messageToSend);
 			clientOutputStream.writeObject(message);
 			clientOutputStream.flush();
-		//	Writer.write(messageToSend);
-		//	Writer.newLine();
-		//	Writer.flush();
-			
-		}catch(Exception e){
-			closeEverything(socket, clientOutputStream, clientInputStream);
+
+		}catch(IOException e){
+			closeEverything(socket,clientOutputStream,clientInputStream);
 		}
 	}
 
+	/*
 	public boolean sendFile(String path){
 		try {
 			int bytes = 0;
@@ -124,7 +110,7 @@ public class Client implements ActionListener,Runnable{
 		}
 		return true;
 	}
-
+*/
 
 	public void listenForMessage() {
 		new Thread(new Runnable() {
@@ -135,12 +121,9 @@ public class Client implements ActionListener,Runnable{
 				
 				while(socket.isConnected()) {
 					try {
-						//msgFromBroadcast = Reader.readLine();
-						//System.out.println(msgFromBroadcast);
 						Message message = (Message) clientInputStream.readObject();
 						System.out.println(message.getText());
-						frame.getPannelloClient().getChatArea().append(message.getText() + "\n");
-						
+						frame.getPannelloClient().addMessageFromServer(message.getUsername(), message.getText()); //poi passando l'oggeto message riusciamo a capire a se � fromServer o Client
 					} catch (Exception e) {
 						closeEverything(socket, clientOutputStream, clientInputStream);
 						break;
@@ -160,18 +143,21 @@ public class Client implements ActionListener,Runnable{
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
 			String msgToSend= this.frame.getPannelloClient().getMessageField().getText();
 			sendMessage(msgToSend);
+			frame.getPannelloClient().addMessageFromClient("You", msgToSend);
 			if(msgToSend.startsWith("/quit")) {
 				System.exit(0);
 			}
+			
 			this.frame.getPannelloClient().clearMessageField();
+			
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			String filePath = frame.openFileSelecterDialog();
-			if(sendFile(filePath)){
+			/*if(sendFile(filePath)){
 				System.out.println("Aggiunto correttamente");
 			}else
 				System.out.println("Errore aggiungione file");
 			System.out.println(filePath);
-
+			*/
 			//TODO: aprire nuova finestra dove scegliere l'imm
 			// agine da mandare e visualizzarla
 			//TODO: gestire l'invio dell'immagine al server
@@ -183,6 +169,8 @@ public class Client implements ActionListener,Runnable{
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 
 }

@@ -12,7 +12,6 @@ public class RunClient {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Window frame = new Window();
-		System.out.println("ciao");
 		try {
 			Socket socket = new Socket("127.0.0.1", 3645);
 			Client client = new Client(frame, socket);

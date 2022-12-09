@@ -5,18 +5,33 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import Model.Message;
+
 public class ConnectionHandler implements Runnable {
 	
 	static class Pair{
 		private String Key;
 		private int value;
+		private ArrayList<String> usersAlreadyVoted = new ArrayList<String>();
 		
+		public ArrayList<String> getUsersAlreadyVoted(){
+			return usersAlreadyVoted;
+		}
 		
+		public boolean addUserVote(String username) {
+			boolean ret = true;
+			for(String s : usersAlreadyVoted) {
+				if(s.equals(username)) {
+					ret = false;
+				}
+			}
+			if(ret)
+				usersAlreadyVoted.add(username);
+			return ret;
+		}
 		public String getKey() {
 			return Key;
 		}
-
-
 	
 		public Integer getValue() {
 			return value;
@@ -35,13 +50,14 @@ public class ConnectionHandler implements Runnable {
 	}
 	
     private static ArrayList<ConnectionHandler> connectionHandlers = new ArrayList<>();
-    private static ArrayList<Pair> votationAnswers = new ArrayList<>();
-    private static String votationQuestion;
     private Socket socketClient;
     private BufferedReader Reader;
     private BufferedWriter Writer;
     private String clientUsername;
 
+    private static ArrayList<Pair> votationAnswers = new ArrayList<>();
+    private static String votationQuestion;
+    private static String userThatStarted;
 
     public ConnectionHandler(Socket socket){
         try {
@@ -52,7 +68,8 @@ public class ConnectionHandler implements Runnable {
             this.clientUsername = Reader.readLine();
             System.out.println(clientUsername);
             connectionHandlers.add(this);
-            sendTextMessageBroadC("has joined the chat!");
+            
+//            sendTextMessageBroadC("has joined the chat!");
         } catch (IOException e) {
             closeEverything(socket, Writer, Reader);
         }
@@ -62,58 +79,79 @@ public class ConnectionHandler implements Runnable {
     // this function receives all the messages sent from the client
     @Override
     public void run() {
-    	String msgFromClient;
-        while(socketClient.isConnected()){
+    	//String msgFromClient;
+        Message msgFromClient = new Message("username","messaggio");
+    	String code;
+    	String message;
+    	while(socketClient.isConnected()){
          try {
         	System.out.println("WAIT");
-			msgFromClient = Reader.readLine(); //operazione bloccante
+			//msgFromClient = Reader.readLine(); //operazione bloccante
+        	//READ MESSAGE
 			System.out.println("FATTO");
-			if(msgFromClient != null) {
-				if(msgFromClient.startsWith("/nick")) {
-					String oldUsername = clientUsername;
-					clientUsername = msgFromClient.substring(6);
-					sendTextMessageBroadC("SERVER:: "+ oldUsername + " has changed his name to " + clientUsername);	
-				}else if(msgFromClient.startsWith("/quit")){
-					closeEverything(socketClient, Writer, Reader);
-					break;
-				}else if(msgFromClient.startsWith("/vote [")) {
-					msgFromClient = msgFromClient.substring(6);
-					if(!createVotation(msgFromClient)) {
-						System.err.println("ERRORE ESISTE GIA UNA VOTAZIONE ATTIVA");
-						sendTextMessageBroadC("SERVER: ERRORE VOTAZIONE GIA ATTIVA");
-					}else {
-						System.out.println(msgFromClient);
-						for(int i=0;i<votationAnswers.size();i++) {
-							System.out.println(votationAnswers.get(i).Key + " --> " + votationAnswers.get(i).value);
-						}
-						sendTextMessageBroadC(msgFromClient);
-					}
-					
-					
-				}else if(msgFromClient.equals("/vote end")) {
-					for(int i=0;i<votationAnswers.size();i++) {
-						System.out.println(votationAnswers.get(i).Key + " --> " + votationAnswers.get(i).value);
-					}
-					String str = endVotation();
-					sendTextMessageBroadC(str);
-					//setText outside the funtion with the resoult;
-				}else if(msgFromClient.startsWith("/v")){
-					msgFromClient = msgFromClient.substring(3);
-					if(msgFromClient.startsWith("/vote")) {
-						msgFromClient = msgFromClient.substring(6);
-					}
-					addVote(msgFromClient);
-					/*
-					 * controllo che Text sia presente tra le risposte possibili
-					 * nell'array delle risposte se si aumento di 1 quella risposta
-					 * */
-				}
-				else {
-					sendTextMessageBroadC(msgFromClient);				
-				}
-			}else {
+			code = msgFromClient.checkForCodeInText();
+			switch (code) {
+			case "NICK": {
+				this.clientUsername = msgFromClient.getText();
+				message = "SERVER " + msgFromClient.getUsername() + " changed his username into " + this.clientUsername;
+				//check if username already exists
+				//broadcast message
+			}
+			case "HELP": {
+				message = "========================\r\n"
+						+ "/n o /nick + nickname  \r\n"
+						+ "/h o /help for commands\r\n"
+						+ "/q o /quit to quit\r\n"
+						+ "/l o /list print users\r\n"
+						+ "@username to send a \r\n"
+						+ "message directly \r\n"
+						+ "/vote [quest] + [A,B]\r\n"
+						+ "to create a votation\r\n"
+						+ "/vote end to end vote\r\n"
+						+ "and print results\r\n"
+						+ "/v o /vote A to vote\r\n"
+						+ "========================";
+				//broadcast message
+			}
+			case "QUIT": {
+				message = "SERVER " + this.clientUsername + " left the chat :(";
+				//broadcast message
 				closeEverything(socketClient, Writer, Reader);
 				break;
+			}
+			case "LIST": {
+				message = printUsernames();
+				//broadcast message
+			}
+			case "VOTECREATE": {
+				if(!createVotation(msgFromClient.getText())) {
+					message = "SERVER " + "there's a votation already active";
+				}else {
+					message = msgFromClient.getText();
+				}
+				//broadcast message
+			}
+			case "VOTEEND": {
+				message = endVotation();
+				if(message == "ERROR") {
+					message = "SERVER " + this.clientUsername + " didn't start the votation";
+				}
+				//broadcast message
+			}
+			case "VOTE": {
+				if(!addVote(msgFromClient.getText(), this.clientUsername)) {
+					message = "SERVER " + this.clientUsername + " has already voted this choice";
+				}else {
+					message = this.clientUsername + " voted " + msgFromClient.getText();
+				}
+				//broadcast message;
+			}
+			case "ERROR incorrect command": {
+				message = "SERVER "+code;
+				//broadcast message
+			}
+			default:
+				broadcastMessage(msgFromClient.getText(), this.clientUsername);
 			}
 			
 		} catch (Exception e) {
@@ -127,30 +165,33 @@ public class ConnectionHandler implements Runnable {
     
     //TODO: fare ricerca per vedere se esiste già uno username
     //TODO: fare una funzione che invii ad un solo user
-    public boolean sendTextMessageBroadC(String messageToSend){
-
-
-        //connectionHandler.out.println(text);
+    
+    private String printUsernames() {
+    	String ret = "========================\r\n";
+    	for (ConnectionHandler cH : connectionHandlers) {   
+    		if(!cH.getClientUsername().equals(this.clientUsername)) {
+    			ret += "> " + cH.clientUsername + "\r\n";
+    		}
+   		}
+    	ret += "========================";
+    	return ret;
+    }
+    
+    private boolean broadcastMessage(String message, String Username){ //add image 
+    	Message msgToSend = new Message(Username, message);
+    	
         for (ConnectionHandler cH : connectionHandlers) {
          try {
-        	 
-        	 if(messageToSend.startsWith("SERVER")) {
-        		cH.Writer.write(messageToSend);
- 				cH.Writer.newLine();
- 				cH.Writer.flush(); 
-        	 }else {
-        		 if(!cH.clientUsername.equals(clientUsername)) {
-        			 cH.Writer.write(clientUsername + ": " + messageToSend);
-        			 cH.Writer.newLine(); // perchè readline aspetta che venga inviata una nuova linea
-        			 cH.Writer.flush(); // riempie il buffer
-        		 }else {
-        			 cH.Writer.write("You" + ": " + messageToSend);
-        			 cH.Writer.newLine(); 
-        			 cH.Writer.flush(); 
-        		 }
-        		 
-        	 }
-		} catch (Exception e) {
+        	 	if(message.startsWith("SERVER")) {
+        	 		message = message.substring(7);
+        	 		msgToSend.setUsername("SERVER");
+        	 		msgToSend.setText(message);
+        	 	}
+        	 	if(!cH.clientUsername.equals(Username)) {
+        			//SEND OBJECT MESSAGE
+        	 	}	 
+        	}
+		 catch (Exception e) {
 			closeEverything(socketClient, Writer, Reader);
 		}
         }
@@ -166,8 +207,6 @@ public class ConnectionHandler implements Runnable {
     
     public void removeConnectionHandler(){
     	connectionHandlers.remove(this);
-    	 sendTextMessageBroadC("SERVER:"+clientUsername+" has left the chat!");
-    	
     }
   
     
@@ -200,44 +239,53 @@ public class ConnectionHandler implements Runnable {
 		return answer;
     }
     
-    public boolean addVote(String vote) {
+    public boolean addVote(String vote, String username) { //lo username arriva dall'oggeto messaggio
     	boolean ret = false;
     	for(Pair vt : votationAnswers) {
     		if(vt.Key.equals(vote)){
-    			ret = true;
-    			vt.IncrementValue();
+    			if(vt.addUserVote(username)) {
+    				ret = true;
+    				vt.IncrementValue();	
+    			}else {
+    				System.out.println("alredy voted this choice");
+    			}
+    			
     		}
     	}
     	return ret;
     }
     
     public void resetVotation() {
-//    	votationAnswers.clear();
-//    	votationQuestion = "";
+    	votationAnswers.clear();
+    	votationQuestion = "";
     }
     
     public String endVotation() {
     	String ret = "";
-    	ret += "=================================\n";
-    	ret += "::" + votationQuestion + "\n";
-    	for(Pair vt : votationAnswers) {
-    		ret += ":: " + vt.Key + " => " + vt.value + "\n";
-     	}
-    	ret += "=================================";
-    	resetVotation();
+    	if(userThatStarted.equals(this.clientUsername)) {
+    		ret += "========================\r\n";
+        	ret += ">" + votationQuestion + "\n";
+        	for(Pair vt : votationAnswers) {
+        		ret += "> " + vt.Key + " = " + vt.value + "\n";
+         	}
+        	ret += "========================";
+        	resetVotation();
+    	}else {
+    		ret = "ERROR";
+    	}
     	return ret;
     }
-    //TODO: fare funzione che stampa risultati e azzera la votazione
+   
     
     public boolean createVotation(String votationText) {
     	// votationText ==> [domanda] : [rips1,rips2,...,rispn];
     	boolean ret = true;
+    	
     	if(votationAnswers.isEmpty()) {
+    		userThatStarted = this.clientUsername;
     		String[] res = votationText.split(":");
         	votationQuestion = res[0];
-        	votationQuestion = votationQuestion.substring(1);
-        	votationQuestion = votationQuestion.substring(votationQuestion.length()-1);
-        	System.out.println(votationQuestion);
+        	//rimuovere parentesi quadre
         	String risp = res[1];
         	risp = risp.substring(1);
         	System.out.println(risp);
@@ -251,6 +299,8 @@ public class ConnectionHandler implements Runnable {
         			votationAnswers.add(new Pair(answer));
         		}
         	}
+        	
+        	
     	}else {
     		ret = false;
     	}

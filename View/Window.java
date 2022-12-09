@@ -29,7 +29,7 @@ public class Window extends JFrame implements WindowListener{
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 800);
-		pannelloClient = new PannelloChat();
+		pannelloClient = new PannelloChat(this);
 		setContentPane(pannelloClient);
 		addWindowListener(this);
 		this.setVisible(true);

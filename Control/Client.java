@@ -19,7 +19,7 @@ public class Client implements ActionListener,Runnable{
 	private Socket socket;
 	private BufferedReader Reader;
 	private BufferedWriter Writer;
-	private String username;
+	private String startUsername;
 
 	public Client(Window _frame, Socket socket) { 
 		this.frame = _frame;
@@ -37,7 +37,7 @@ public class Client implements ActionListener,Runnable{
 
 	//TODO: controllo che lo user non esista gia
 	public void setUsername(String username) {
-		this.username = username;
+		this.startUsername = username;
 		try {
 			Writer.write(username);
 			Writer.newLine();
@@ -88,8 +88,7 @@ public class Client implements ActionListener,Runnable{
 					try {
 						msgFromBroadcast = Reader.readLine();
 						System.out.println(msgFromBroadcast);
-						frame.getPannelloClient().getChatArea().append(msgFromBroadcast + "\n");
-						
+						frame.getPannelloClient().addMessageFromServer("username", msgFromBroadcast); //poi passando l'oggeto message riusciamo a capire a se è fromServer o Client
 					} catch (Exception e) {
 						closeEverything(socket, Writer, Reader);
 						break;
@@ -110,10 +109,13 @@ public class Client implements ActionListener,Runnable{
 		if(e.getSource() == frame.getPannelloClient().getSendMessageBtn()) {
 			String msgToSend= this.frame.getPannelloClient().getMessageField().getText();
 			sendMessage(msgToSend);
+			frame.getPannelloClient().addMessageFromClient("You", msgToSend);
 			if(msgToSend.startsWith("/quit")) {
 				System.exit(0);
 			}
+			
 			this.frame.getPannelloClient().clearMessageField();
+			
 		}else if(e.getSource() == frame.getPannelloClient().getSendImgBtn()) {
 			//TODO: aprire nuova finestra dove scegliere l'immagine da mandare e visualizzarla
 			//TODO: gestire l'invio dell'immagine al server

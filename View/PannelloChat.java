@@ -15,13 +15,51 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JLabel;
+import java.awt.Canvas;
+import java.awt.Component;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+
+import java.awt.ScrollPane;
+import java.awt.Panel;
+import net.miginfocom.swing.MigLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 public class PannelloChat extends JPanel {
 	private JTextField messageField;
-	private JTextArea chatArea;
+//	private JTextArea chatArea;
 	private JButton sendMessageBtn;
 	private JButton sendImgBtn;
 	private JLabel UsernameLabel;
+	private ScrollPane scrollPane;
+	private JPanel messagesContainer;
+	private int contMessageRow;
+	private Window frame;
+
+	
+	public JPanel getMessagesContainer() {
+		return messagesContainer;
+	}
+	
+	public void refreshWindow() {
+		frame.setSize(frame.getSize().width, frame.getSize().height + 1);
+		frame.setSize(frame.getSize().width, frame.getSize().height - 1);
+		System.out.println("REFRESHED");
+	}
+	public void addMessageFromClient(String Username, String message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(Username, message),"cell 1 "+contMessageRow+",grow");
+		refreshWindow();
+		
+		contMessageRow++;
+	}
+	
+	public void addMessageFromServer(String Username, String message) { //poi gli passeremo l'oggeto Message
+		messagesContainer.add(new MessageBox(Username, message),"cell 0 "+contMessageRow+",grow");
+		refreshWindow();
+	
+		contMessageRow++;
+	}
 
 	public JLabel getUsernameLabel() {
 		return UsernameLabel;
@@ -38,10 +76,6 @@ public class PannelloChat extends JPanel {
 
 
 
-	public JTextArea getChatArea() {
-		return chatArea;
-	}
-
 	
 
 	public JButton getSendMessageBtn() {
@@ -56,10 +90,13 @@ public class PannelloChat extends JPanel {
 	public void clearMessageField() {
 		messageField.setText("");
 	}
-	/**
-	 * Create the panel.
-	 */
-	public PannelloChat() {
+
+	public PannelloChat(Window _frame) {
+	
+		this.frame = _frame;
+		this.setSize(400, 600);
+		this.contMessageRow = 0;
+		setBackground(Color.BLACK);
 
 		
 
@@ -67,13 +104,13 @@ public class PannelloChat extends JPanel {
 
 		setLayout(new BorderLayout(0, 0));
 		
-		chatArea = new JTextArea();
-		chatArea.setEditable(false);
-		chatArea.setForeground(Color.GREEN);
-		chatArea.setBackground(Color.BLACK);
-		chatArea.setLineWrap(true);
-		chatArea.setFont(new Font("Source Sans Pro Light", Font.BOLD, 15));
-		add(chatArea, BorderLayout.CENTER);
+//		chatArea = new JTextArea();
+//		chatArea.setEditable(false);
+//		chatArea.setForeground(Color.GREEN);
+//		chatArea.setBackground(Color.BLACK);
+//		chatArea.setLineWrap(true);
+//		chatArea.setFont(new Font("Source Sans Pro Light", Font.BOLD, 15));
+//		add(chatArea, BorderLayout.CENTER);
 		
 		JPanel SendMessagePane = new JPanel();
 		SendMessagePane.setBackground(Color.BLACK);
@@ -130,7 +167,24 @@ public class PannelloChat extends JPanel {
 		UsernameLabel.setForeground(Color.GREEN);
 		UsernameLabel.setBackground(Color.BLACK);
 		add(UsernameLabel, BorderLayout.NORTH);
+		
+	
 
+		
+		scrollPane = new ScrollPane();
+		scrollPane.setBackground(Color.BLACK);
+		add(scrollPane, BorderLayout.CENTER);
+		
+		messagesContainer = new JPanel();
+		messagesContainer.setBackground(Color.BLACK);
+		scrollPane.add(messagesContainer);
+		messagesContainer.setLayout(new MigLayout("", "[grow,fill][grow,fill]"));
+		
+		
+		
+		
+
+	
 	}
 
 

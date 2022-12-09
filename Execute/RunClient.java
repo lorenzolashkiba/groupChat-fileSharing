@@ -14,8 +14,8 @@ public class RunClient {
 		Window frame = new Window();
 		System.out.println("ciao");
 		try {
-			Socket socket = new Socket("localhost", 3645);
-			Client client = new Client(frame, socket );
+			Socket socket = new Socket("127.0.0.1", 3645);
+			Client client = new Client(frame, socket);
 			client.listenForMessage();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

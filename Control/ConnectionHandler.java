@@ -1,6 +1,8 @@
 package Control;
 
 
+import Model.Message;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -10,21 +12,29 @@ public class ConnectionHandler implements Runnable {
     private Socket socketClient;
     public BufferedReader Reader;
     public BufferedWriter Writer;
+    private DataInputStream ReaderD;
+    private DataOutputStream WriterD;
     private String clientUsername;
-
-
+    private  ObjectInputStream serverInputStream;
+    private  ObjectOutputStream serverOutputStream;
     public ConnectionHandler(Socket socket){
         try {
         	this.socketClient = socket;
             Writer = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
             Reader = new BufferedReader(new InputStreamReader(this.socketClient.getInputStream()));
+            ReaderD = new DataInputStream(socket.getInputStream());
+            WriterD = new DataOutputStream(socket.getOutputStream());
+            serverInputStream = new ObjectInputStream(socket.getInputStream());
+            serverOutputStream = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("Connesione richiesta da: "+ socketClient.getInetAddress().toString()+":"+socketClient.getPort());
-            this.clientUsername = Reader.readLine();
-            System.out.println(clientUsername);
+            Message message = (Message) serverInputStream.readObject();
+            this.clientUsername = message.getUsername();
+            //this.clientUsername = Reader.readLine();
+            //System.out.println(clientUsername);
             connectionHandlers.add(this);
-            sendTextMessageBroadC("has joined the chat!");
-        } catch (IOException e) {
-            closeEverything(socket, Writer, Reader);
+            sendTextMessageBroadC(new Message(clientUsername,"has joined the chat!"));
+        } catch (Exception e) {
+            closeEverything(socketClient, serverOutputStream, serverInputStream);
         }
     }
     
@@ -33,51 +43,65 @@ public class ConnectionHandler implements Runnable {
     @Override
     public void run() {
     	String msgFromClient;
+        Boolean sendingFile = false;
         while(socketClient.isConnected()){
          try {
         	System.out.println("WAIT");
-			msgFromClient = Reader.readLine(); //operazione bloccante
+             Message message = (Message) serverInputStream.readObject(); //operazione bloccante
+             msgFromClient = message.getText();
 			System.out.println("FATTO");
 			if(msgFromClient != null) {
+
 				if(msgFromClient.startsWith("/nick")) {
 					String oldUsername = clientUsername;
 					clientUsername = msgFromClient.substring(6);
-					sendTextMessageBroadC("SERVER:: "+ oldUsername + " has changed his name to " + clientUsername);	
+					sendTextMessageBroadC(new Message(clientUsername,"SERVER:: "+ oldUsername + " has changed his name to " + clientUsername));
 				}else if(msgFromClient.startsWith("/quit")){
-					closeEverything(socketClient, Writer, Reader);
+                    closeEverything(socketClient, serverOutputStream, serverInputStream);
 					break;
 				}
-				else {
-					sendTextMessageBroadC(msgFromClient);				
-				}
+				else if(msgFromClient.endsWith(".png")||msgFromClient.endsWith(".jpg")||msgFromClient.endsWith(".txt")) {
+							receiveFile(msgFromClient);
+                            sendingFile = true;
+				}else{
+                    sendTextMessageBroadC(new Message(clientUsername,msgFromClient));
+                }
 			}else {
-				closeEverything(socketClient, Writer, Reader);
+                closeEverything(socketClient, serverOutputStream, serverInputStream);
 				break;
 			}
 			
 		} catch (Exception e) {
-			closeEverything(socketClient, Writer, Reader);
+             closeEverything(socketClient, serverOutputStream, serverInputStream);
 			break;
 		}
         }
     }
     
-    
-    
-    public boolean sendTextMessageBroadC(String messageToSend){
+    public void receiveFile(String fileName){
+        try {
+            int bytes = 0;
+            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
 
+        }catch (Exception e){
+            System.out.println("errore receving file");
+        }
+    }
+    
+    public void sendTextMessageBroadC(Message message){
+        String messageToSend = message.getText();
         //connectionHandler.out.println(text);
         for (ConnectionHandler cH : connectionHandlers) {
          try {
         	 
         	 if(messageToSend.startsWith("SERVER")) {
-        		cH.Writer.write(messageToSend);
+        		cH.serverOutputStream.writeObject(new Message(cH.getClientUsername(),messageToSend));
  				cH.Writer.newLine();
  				cH.Writer.flush(); 
         	 }else {
         		 if(!cH.clientUsername.equals(clientUsername)) {
         			 cH.Writer.write(clientUsername + ": " + messageToSend);
-        			 cH.Writer.newLine(); // perchè readline aspetta che venga inviata una nuova linea
+        			 cH.Writer.newLine(); // perchï¿½ readline aspetta che venga inviata una nuova linea
         			 cH.Writer.flush(); // riempie il buffer
         		 }else {
         			 cH.Writer.write("You" + ": " + messageToSend);
@@ -87,10 +111,9 @@ public class ConnectionHandler implements Runnable {
         		 
         	 }
 		} catch (Exception e) {
-			closeEverything(socketClient, Writer, Reader);
+             closeEverything(socketClient, serverOutputStream, serverInputStream);
 		}
         }
-        return true;
     }
     
 
@@ -101,18 +124,18 @@ public class ConnectionHandler implements Runnable {
    
     public void removeConnectionHandler() {
     	connectionHandlers.remove(this);
-    	sendTextMessageBroadC("/SERVER: " + clientUsername + ": has left the chat :(");
+    	sendTextMessageBroadC(new Message(clientUsername,"/SERVER: " + clientUsername + ": has left the chat :("));
     }
-    
-   
-    public void closeEverything(Socket socket,BufferedWriter write, BufferedReader read ){
-    	removeConnectionHandler();
+
+
+    public void closeEverything(Socket socket, ObjectOutputStream writer, ObjectInputStream in ){
+        removeConnectionHandler();
         try {
-            if (read != null) {
-                read.close();
+            if (in != null) {
+                in.close();
             }
-            if (write != null) {
-                write.close();
+            if (writer != null) {
+                writer.close();
             }
             if (socket != null) {
                 socket.close();
@@ -121,7 +144,8 @@ public class ConnectionHandler implements Runnable {
             e.printStackTrace();
         }
     }
-    
+
+
     @Override
     public String toString(){
         return clientUsername;

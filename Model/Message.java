@@ -1,19 +1,26 @@
 package Model;
 
-public class Message {
+import java.io.Serializable;
+import java.util.ArrayList;
 
-	
+public class Message implements Serializable {
+
+	//private static ArrayList<File> files;
 	private String username;
 	private String Text;
 	//img
+	private String filename;
 	
 	public Message(String _username,String _text) {
 		this.username = _username;
 		this.Text = _text;
-		//img
+		//files = new ArrayList<>();
+
 	}
 	
-	
+	public void addFile(File file){
+		//files.add(file);
+	}
 	public String getUsername() {
 		return username;
 	}
@@ -26,8 +33,11 @@ public class Message {
 	public void setText(String text) {
 		Text = text;
 	}
-	
-	
+
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
 	public String checkForCodeInText() {
 		String retCode = "";
 		if(Text.startsWith("/n")) {

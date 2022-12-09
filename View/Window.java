@@ -5,14 +5,13 @@ import java.awt.EventQueue;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
 import java.lang.ModuleLayer.Controller;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import Control.Client;
@@ -20,6 +19,7 @@ import Control.Client;
 public class Window extends JFrame implements WindowListener{
 
 	private PannelloChat pannelloClient;
+
 	private String username;
 	public PannelloChat getPannelloClient() {
 		return pannelloClient;
@@ -56,7 +56,17 @@ public class Window extends JFrame implements WindowListener{
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	public String openFileSelecterDialog(){
+		JFileChooser jFileChooser = new JFileChooser();
+		int response = jFileChooser.showOpenDialog(null);
+		if(response==JFileChooser.APPROVE_OPTION){
+			File file = new File(jFileChooser.getSelectedFile().getAbsolutePath());
+			return jFileChooser.getSelectedFile().getAbsolutePath();
+		}
 
+
+		return null;
+	}
 	@Override
 	public void windowOpened(WindowEvent e) {
 		Integer rand = (int)(Math.random()*9999 - 0 + 1);

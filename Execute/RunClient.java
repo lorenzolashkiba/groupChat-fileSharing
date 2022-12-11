@@ -13,7 +13,8 @@ public class RunClient {
 		// TODO Auto-generated method stub
 		Window frame = new Window();
 		try {
-			Socket socket = new Socket("127.0.0.1", 3645);
+			Socket socket = new Socket("127.0.0.1", 3636);
+			
 			Client client = new Client(frame, socket);
 			client.listenForMessage();
 		} catch (UnknownHostException e) {

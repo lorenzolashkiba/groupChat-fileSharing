@@ -70,7 +70,6 @@ public class Window extends JFrame implements WindowListener{
 		int max = 999;
 		int min = 10;
 		username = "Guest" + ((int)(Math.random() * max - min + 1) + min) + (int) java.time.LocalTime.now().getSecond();
-		
 		pannelloClient.getUsernameLabel().setText("You are: "+username);
 		client.setUsername(username);
 		
@@ -79,12 +78,10 @@ public class Window extends JFrame implements WindowListener{
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 		int control=JOptionPane.showConfirmDialog(this, "Do you want to leave the session?", "Confirm", JOptionPane.YES_NO_OPTION);
 		if(control==JOptionPane.YES_OPTION){
 			client.sendMessage("/quit");
 			System.exit(0);
-			//TODO: scollegare il client e mettere in chat il messaggio che si � collegato
 		}		
 		else{
 			this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

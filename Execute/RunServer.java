@@ -10,7 +10,7 @@ public class RunServer {
 	public static void main(String[] args) {
 		
 		try {
-			ServerSocket serverSocket = new ServerSocket(3645);
+			ServerSocket serverSocket = new ServerSocket(3636);
 			Server server = new Server(serverSocket);
 			server.startServer();
 		} catch (IOException e) {

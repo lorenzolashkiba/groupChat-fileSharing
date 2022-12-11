@@ -3,6 +3,8 @@ package View;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import java.awt.Color;
 import javax.swing.JTextArea;
@@ -11,7 +13,7 @@ public class MessageBox extends JPanel {
 
 	private String username;
 	private String message;
-	//img
+	private String imgPATH;
 	
 	public String getUsername() {
 		return username;
@@ -44,6 +46,8 @@ public class MessageBox extends JPanel {
 		this.username = _username;
 		this.message = _message;
 		
+	
+		
 		JLabel labelUsername = new JLabel(username);
 		labelUsername.setForeground(Color.BLACK);
 		labelUsername.setBackground(Color.BLACK);
@@ -58,6 +62,24 @@ public class MessageBox extends JPanel {
 		add(txtArea, "cell 0 1");
 		
 		
+	}
+	
+	
+	
+	
+	public MessageBox(String _username, String _message, String _imgPATH) {
+		this(_username, _message);
+		this.imgPATH = _imgPATH;
+		
+		JLabel labelUsername = new JLabel(username);
+		labelUsername.setForeground(Color.BLACK);
+		labelUsername.setBackground(Color.BLACK);
+		add(labelUsername, "cell 0 0");
+		
+		JLabel imgLabel = new JLabel("");
+		imgLabel.setIcon(new ImageIcon("../assets/image-icon.png"));
+		imgLabel.setBackground(Color.GREEN);
+		add(imgLabel, "cell 0 1");
 	}
 
 	

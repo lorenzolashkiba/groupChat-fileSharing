@@ -19,14 +19,12 @@ import Control.Client;
 public class Window extends JFrame implements WindowListener{
 
 	private PannelloChat pannelloClient;
-
 	private String username;
 	public PannelloChat getPannelloClient() {
 		return pannelloClient;
 	}
 	private Client client;
 	public Window() {
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 800);
 		pannelloClient = new PannelloChat(this);
@@ -69,10 +67,11 @@ public class Window extends JFrame implements WindowListener{
 	}
 	@Override
 	public void windowOpened(WindowEvent e) {
-		Integer rand = (int)(Math.random()*9999 - 0 + 1);
-		username = JOptionPane.showInputDialog(getParent(),
-                "Enter a username: ", "Guest" + rand.toString());
-		pannelloClient.getUsernameLabel().setText("User:"+username);
+		int max = 999;
+		int min = 10;
+		username = "Guest" + ((int)(Math.random() * max - min + 1) + min) + (int) java.time.LocalTime.now().getSecond();
+		
+		pannelloClient.getUsernameLabel().setText("You are: "+username);
 		client.setUsername(username);
 		
 		

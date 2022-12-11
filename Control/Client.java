@@ -157,7 +157,7 @@ public class Client implements ActionListener{
 			}
 			if(retCode == "NICK") {
 				startUsername = message.getText();
-				frame.getPannelloClient().setUsernameLabel(message.getText());
+				frame.getPannelloClient().setUsernameLabel("You are: "+message.getText());
 				
 			}
 			

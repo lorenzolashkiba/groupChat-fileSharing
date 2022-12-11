@@ -72,7 +72,12 @@ public class ConnectionHandler implements Runnable {
             serverOutputStream = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("Connesione richiesta da: "+ socketClient.getInetAddress().toString()+":"+socketClient.getPort());
             Message message = (Message) serverInputStream.readObject();
-            this.clientUsername = message.getUsername();
+            if(!userExists(message.getUsername())) {
+            	this.clientUsername = message.getUsername();
+            }else {
+            	blocked = true;
+            }
+            
             connectionHandlers.add(this);
             broadcastMessage(new Message(clientUsername," has joined the chat!"));
         } catch (Exception e) {
@@ -91,7 +96,7 @@ public class ConnectionHandler implements Runnable {
     	while(socketClient.isConnected()){
          try {
         	System.out.println("WAIT");
-			 msgFromClient = (Message) serverInputStream.readObject(); //operazione bloccante
+			msgFromClient = (Message) serverInputStream.readObject(); //operazione bloccante
         	//READ MESSAGE
 			System.out.println("FATTO");
 			code = msgFromClient.checkForCodeInText();
@@ -121,7 +126,7 @@ public class ConnectionHandler implements Runnable {
 							+ "/l o /list print users\r\n"
 							+ "@username to send a \r\n"
 							+ "message directly \r\n"
-							+ "/vote [quest] + [A,B]\r\n"
+							+ "/vote [quest] : [A,B]\r\n"
 							+ "to create a votation\r\n"
 							+ "/vote end to end vote\r\n"
 							+ "and print results\r\n"
@@ -235,6 +240,8 @@ public class ConnectionHandler implements Runnable {
     			}
     		}
    		}
+    	
+    
     }
     public void receiveFile(String fileName){
         try {

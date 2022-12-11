@@ -148,14 +148,12 @@ public class PannelloChat extends JPanel {
 	public void addMessageFromClient(Message message) { //poi gli passeremo l'oggeto Message
 		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 1 "+contMessageRow+",grow");
 		refreshWindow();
-		
 		contMessageRow++;
 	}
 	
 	public void addMessageFromServer(Message message) { //poi gli passeremo l'oggeto Message
 		messagesContainer.add(new MessageBox(message.getUsername(), message.getText()),"cell 0 "+contMessageRow+",grow");
 		refreshWindow();
-	
 		contMessageRow++;
 	}
 

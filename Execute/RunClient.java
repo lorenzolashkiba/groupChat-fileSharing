@@ -10,20 +10,27 @@ import View.Window;
 public class RunClient {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Window frame = new Window();
+		Socket socket = null;
+		boolean scanning = true;
+		
+		while(scanning) {
 		try {
-			Socket socket = new Socket("127.0.0.1", 3636);
-			
-			Client client = new Client(frame, socket);
-			client.listenForMessage();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			socket = new Socket("127.0.0.1", 3636);
+			scanning = false;
+			} catch (Exception e) {	
+		    System.out.println("Client waiting for server...");
+		    try {
+	            Thread.sleep(2000);//2 seconds
+	        } catch(InterruptedException ie){
+	            ie.printStackTrace();
+	        }
+			} 
 		}
+		
+		Window frame = new Window();
+		System.out.println("WTF");
+		Client client = new Client(frame, socket);
+		client.listenForMessage();
 	}
 
 }

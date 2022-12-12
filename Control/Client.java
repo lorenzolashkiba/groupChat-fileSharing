@@ -126,8 +126,6 @@ public class Client implements ActionListener{
 						Message message = (Message) clientInputStream.readObject();
 						System.out.println(message.getText());
 						frame.getPannelloClient().addMessageFromServer(message); 
-						
-						
 					} catch (Exception e) {
 						closeEverything(socket, clientOutputStream, clientInputStream);
 						break;
